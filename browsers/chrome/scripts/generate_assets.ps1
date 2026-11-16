@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Generates all PNG artwork assets for the Neon Horizon Synthwave Google Chrome theme.
@@ -69,6 +69,7 @@ namespace SynthwaveAssets
 
         private static double SmoothStep(double edge0, double edge1, double x)
         {
+            if (edge1 <= edge0) return x >= edge1 ? 1.0 : 0.0;
             double t = Math.Max(0.0, Math.Min(1.0, (x - edge0) / (edge1 - edge0)));
             return t * t * (3.0 - 2.0 * t);
         }
@@ -116,6 +117,37 @@ namespace SynthwaveAssets
             double starIntensity,
             int seed)
         {
+            BuildUiStrip(
+                outputPath, width, height,
+                topColor, midColor, botColor, midPos,
+                beamA, beamB, beamC, beamOpacity, beamGlowRows,
+                scanlineStrength, starCount, starIntensity, seed,
+                0.0, 0.0, 1
+            );
+        }
+
+        public static void BuildUiStrip(
+            string outputPath,
+            int width,
+            int height,
+            RgbColor topColor,
+            RgbColor midColor,
+            RgbColor botColor,
+            double midPos,
+            RgbColor beamA,
+            RgbColor beamB,
+            RgbColor beamC,
+            double beamOpacity,
+            int beamGlowRows,
+            double scanlineStrength,
+            int starCount,
+            double starIntensity,
+            int seed,
+            double tabBandHeight,
+            double bodyWaveStrength,
+            int waveCycles)
+        {
+            int cycles = Math.Max(1, waveCycles);
             using (var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb))
             {
                 var rect = new Rectangle(0, 0, width, height);
@@ -152,8 +184,19 @@ namespace SynthwaveAssets
                     double beamFade = 0.0;
                     if (beamOpacity > 0.0 && y <= beamGlowRows)
                     {
-                        beamFade = beamOpacity * Math.Exp(-y * 0.62);
+                        double rimDecay = Math.Exp(-y * 0.48);
+                        double rimTail = 1.0 - SmoothStep(Math.Max(1.0, beamGlowRows * 0.45), beamGlowRows + 0.5, y);
+                        beamFade = beamOpacity * rimDecay * rimTail;
                     }
+
+                    double bodyWaveFade = 0.0;
+                    if (bodyWaveStrength > 0.0 && tabBandHeight > 0.0 && y < tabBandHeight)
+                    {
+                        double decayStart = Math.Max(4.0, tabBandHeight * 0.42);
+                        bodyWaveFade = bodyWaveStrength * (1.0 - SmoothStep(decayStart, tabBandHeight, y));
+                    }
+
+                    double totalWaveMix = Math.Min(0.95, bodyWaveFade + beamFade * (1.0 - bodyWaveFade));
 
                     int rowOffset = y * stride;
                     for (int x = 0; x < width; x++)
@@ -162,13 +205,13 @@ namespace SynthwaveAssets
                         double g = rowBase.G * scanMul;
                         double b = rowBase.B * scanMul;
 
-                        if (beamFade > 0.001)
+                        if (totalWaveMix > 0.001)
                         {
-                            double u = (double)x / width;
+                            double u = ((double)x / width) * cycles;
                             RgbColor beam = SampleNeonWave(beamA, beamB, beamC, u);
-                            r = r + (beam.R - r) * beamFade;
-                            g = g + (beam.G - g) * beamFade;
-                            b = b + (beam.B - b) * beamFade;
+                            r = r + (beam.R - r) * totalWaveMix;
+                            g = g + (beam.G - g) * totalWaveMix;
+                            b = b + (beam.B - b) * totalWaveMix;
                         }
 
                         double st = starMask[y * width + x];
@@ -190,6 +233,67 @@ namespace SynthwaveAssets
                         buf[idx + 1] = ClampByte(g + dither);
                         buf[idx + 2] = ClampByte(r + dither);
                         buf[idx + 3] = 255;
+                    }
+                }
+
+                Marshal.Copy(buf, 0, data.Scan0, buf.Length);
+                bmp.UnlockBits(data);
+                SavePng(bmp, outputPath);
+            }
+        }
+
+        public static void BuildWindowControlBackground(
+            string outputPath,
+            int width,
+            int height,
+            RgbColor topTint,
+            RgbColor lowTint,
+            RgbColor beamA,
+            RgbColor beamB,
+            RgbColor beamC,
+            double activeBandHeight,
+            int waveCycles)
+        {
+            int cycles = Math.Max(1, waveCycles);
+            using (var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+            {
+                var rect = new Rectangle(0, 0, width, height);
+                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                int stride = data.Stride;
+                byte[] buf = new byte[stride * height];
+
+                for (int y = 0; y < height; y++)
+                {
+                    int rowOffset = y * stride;
+                    if (y >= activeBandHeight)
+                    {
+                        // Stay fully transparent below the caption cluster so DPI tiling never repeats
+                        continue;
+                    }
+
+                    double ty = y / Math.Max(1.0, activeBandHeight);
+                    RgbColor vColor = RgbColor.Lerp(topTint, lowTint, ty);
+                    double topRim = 0.34 * Math.Exp(-y * 0.65) * (1.0 - SmoothStep(2.0, 5.5, y));
+                    double pillowAlpha = 0.44 * (1.0 - SmoothStep(10.0, activeBandHeight, y));
+                    double alphaNorm = Math.Min(0.75, pillowAlpha + topRim * (1.0 - pillowAlpha));
+
+                    if (alphaNorm <= 0.002) continue;
+
+                    double waveMix = 0.24 + topRim * 0.55;
+                    for (int x = 0; x < width; x++)
+                    {
+                        double u = ((double)x / width) * cycles;
+                        RgbColor wave = SampleNeonWave(beamA, beamB, beamC, u);
+                        double r = vColor.R + (wave.R - vColor.R) * waveMix;
+                        double g = vColor.G + (wave.G - vColor.G) * waveMix;
+                        double b = vColor.B + (wave.B - vColor.B) * waveMix;
+
+                        double dither = (Bayer4x4[y & 3, x & 3] / 16.0 - 0.5) * 0.8;
+                        int idx = rowOffset + x * 4;
+                        buf[idx + 0] = ClampByte(b + dither);
+                        buf[idx + 1] = ClampByte(g + dither);
+                        buf[idx + 2] = ClampByte(r + dither);
+                        buf[idx + 3] = ClampByte(alphaNorm * 255.0);
                     }
                 }
 
@@ -369,6 +473,11 @@ namespace SynthwaveAssets
 
         public static void BuildThemeIcon(string outputPath, int size)
         {
+            BuildThemeIcon(outputPath, size, 18f);
+        }
+
+        public static void BuildThemeIcon(string outputPath, int size, float padAt512)
+        {
             if (size <= 24)
             {
                 // Pixel-crisp bespoke geometry for 16x16 / small icons
@@ -451,9 +560,15 @@ namespace SynthwaveAssets
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.Clear(Color.Transparent);
 
-                float pad = 18f;
-                var cardRect = new RectangleF(pad, pad, hi - pad * 2f, hi - pad * 2f);
-                float radius = 104f;
+                float strokeW = 14f * ((hi - padAt512 * 2f) / 476f);
+                float halfStroke = strokeW * 0.5f;
+                float outerPad = padAt512 + halfStroke;
+                float cardSize = hi - outerPad * 2f;
+                float ox = outerPad;
+                float oy = outerPad;
+                float s = cardSize / 476f;
+                var cardRect = new RectangleF(ox, oy, cardSize, cardSize);
+                float radius = 104f * s;
 
                 using (var cardPath = CreateRoundedRect(cardRect, radius))
                 {
@@ -461,8 +576,8 @@ namespace SynthwaveAssets
 
                     // Sky gradient background
                     using (var skyBrush = new LinearGradientBrush(
-                        new PointF(0, pad),
-                        new PointF(0, hi - pad),
+                        new PointF(0, oy),
+                        new PointF(0, oy + cardSize),
                         Color.FromArgb(11, 7, 26),
                         Color.FromArgb(40, 14, 72)))
                     {
@@ -470,12 +585,12 @@ namespace SynthwaveAssets
                     }
 
                     // Soft radial magenta aura behind sun
-                    float sunSize = 276f;
+                    float sunSize = 276f * s;
                     float sunX = (hi - sunSize) / 2f;
-                    float sunY = 92f;
+                    float sunY = oy + 74f * s;
                     using (var auraPath = new GraphicsPath())
                     {
-                        auraPath.AddEllipse(sunX - 48f, sunY - 48f, sunSize + 96f, sunSize + 96f);
+                        auraPath.AddEllipse(sunX - 48f * s, sunY - 48f * s, sunSize + 96f * s, sunSize + 96f * s);
                         using (var pgb = new PathGradientBrush(auraPath))
                         {
                             pgb.CenterColor = Color.FromArgb(145, 255, 42, 133);
@@ -485,7 +600,7 @@ namespace SynthwaveAssets
                     }
 
                     // Outrun sliced sun
-                    float horizonY = 326f;
+                    float horizonY = oy + 308f * s;
                     using (var sunClip = new Region(new RectangleF(0, 0, hi, horizonY)))
                     {
                         var prevClip = g.Clip.Clone();
@@ -516,11 +631,11 @@ namespace SynthwaveAssets
                         // Horizontal slice cutouts across lower sun
                         using (var cutBrush = new SolidBrush(Color.FromArgb(24, 11, 45)))
                         {
-                            float[] cutYs = { 216f, 242f, 266f, 288f, 308f };
+                            float[] cutOffsets = { 198f, 224f, 248f, 270f, 290f };
                             float[] cutHs = { 6f, 9f, 11f, 13f, 14f };
-                            for (int i = 0; i < cutYs.Length; i++)
+                            for (int i = 0; i < cutOffsets.Length; i++)
                             {
-                                g.FillRectangle(cutBrush, sunX - 4f, cutYs[i], sunSize + 8f, cutHs[i]);
+                                g.FillRectangle(cutBrush, sunX - 4f * s, oy + cutOffsets[i] * s, sunSize + 8f * s, cutHs[i] * s);
                             }
                         }
 
@@ -530,46 +645,45 @@ namespace SynthwaveAssets
                     // Floor & neon perspective grid
                     using (var floorBrush = new LinearGradientBrush(
                         new PointF(0, horizonY),
-                        new PointF(0, hi - pad),
+                        new PointF(0, oy + cardSize),
                         Color.FromArgb(24, 10, 46),
                         Color.FromArgb(10, 5, 22)))
                     {
                         g.FillRectangle(floorBrush, 0, horizonY, hi, hi - horizonY);
                     }
 
-                    using (var hGlow = new Pen(Color.FromArgb(220, 0, 240, 255), 5f))
+                    using (var hGlow = new Pen(Color.FromArgb(220, 0, 240, 255), 5f * s))
                     {
                         g.DrawLine(hGlow, 0, horizonY, hi, horizonY);
                     }
 
                     // Perspective grid lines
                     float vpX = hi / 2f;
-                    float vpY = horizonY - 12f;
-                    using (var gridPen = new Pen(Color.FromArgb(210, 255, 42, 165), 4.5f))
+                    using (var gridPen = new Pen(Color.FromArgb(210, 255, 42, 165), 4.5f * s))
                     {
                         for (int i = -5; i <= 5; i++)
                         {
-                            float bx = vpX + i * 76f;
-                            g.DrawLine(gridPen, vpX + i * 16f, horizonY, bx, hi);
+                            float bx = vpX + i * 76f * s;
+                            g.DrawLine(gridPen, vpX + i * 16f * s, horizonY, bx, oy + cardSize);
                         }
-                        float[] rowYs = { 348f, 376f, 412f, 456f };
-                        foreach (float ry in rowYs)
+                        float[] rowOffsets = { 330f, 358f, 394f, 438f };
+                        foreach (float ro in rowOffsets)
                         {
-                            g.DrawLine(gridPen, 0, ry, hi, ry);
+                            g.DrawLine(gridPen, 0, oy + ro * s, hi, oy + ro * s);
                         }
                     }
 
                     g.ResetClip();
                 }
 
-                // Crisp neon cyan-to-magenta border ring
+                // Crisp neon cyan-to-magenta border ring inset cleanly within outer margin
                 using (var borderPath = CreateRoundedRect(cardRect, radius))
                 using (var borderBrush = new LinearGradientBrush(
-                    new PointF(pad, pad),
-                    new PointF(hi - pad, hi - pad),
+                    new PointF(ox, oy),
+                    new PointF(ox + cardSize, oy + cardSize),
                     Color.FromArgb(0, 240, 255),
                     Color.FromArgb(255, 42, 133)))
-                using (var borderPen = new Pen(borderBrush, 14f))
+                using (var borderPen = new Pen(borderBrush, strokeW))
                 {
                     g.DrawPath(borderPen, borderPath);
                 }
@@ -582,6 +696,201 @@ namespace SynthwaveAssets
                     fg.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     fg.CompositingQuality = CompositingQuality.HighQuality;
                     fg.DrawImage(master, new Rectangle(0, 0, size, size));
+                    SavePng(finalBmp, outputPath);
+                }
+            }
+        }
+
+        public static void BuildPromoTile(string sourcePath, string outputPath, int width, int height, bool isMarquee)
+        {
+            const int ss = 2;
+            int mw = width * ss;
+            int mh = height * ss;
+
+            using (var src = new Bitmap(sourcePath))
+            using (var master = new Bitmap(mw, mh, PixelFormat.Format24bppRgb))
+            using (var g = Graphics.FromImage(master))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.CompositingQuality = CompositingQuality.HighQuality;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+
+                // Dark midnight sky fill
+                g.Clear(Color.FromArgb(11, 7, 24));
+
+                // Cover-crop source Outrun wallpaper anchored to the right side with seamless left fade
+                double srcAspect = (double)src.Width / src.Height;
+                double dstAspect = (double)mw / mh;
+                float drawW, drawH;
+                if (dstAspect >= srcAspect)
+                {
+                    drawW = mw * (isMarquee ? 0.76f : 1.00f);
+                    drawH = (float)(drawW / srcAspect);
+                    if (drawH < mh * 1.02f)
+                    {
+                        drawH = mh * 1.02f;
+                        drawW = (float)(drawH * srcAspect);
+                    }
+                }
+                else
+                {
+                    drawH = mh * 1.06f;
+                    drawW = (float)(drawH * srcAspect);
+                }
+                float drawX = isMarquee ? (mw - drawW * 0.94f) : (mw * 0.68f - drawW * 0.50f);
+                float drawY = (mh - drawH) * (isMarquee ? 0.52f : 0.44f);
+                g.DrawImage(src, new RectangleF(drawX, drawY, drawW, drawH));
+
+                // Left dark cosmic vignette covering any wallpaper left boundary seam seamlessly
+                float fadeEnd = isMarquee ? Math.Max(mw * 0.54f, drawX + mw * 0.22f) : (mw * 0.72f);
+                float seamCover = isMarquee ? Math.Max(0.24f, (drawX + 40f) / mw) : 0.0f;
+                using (var scrm = new LinearGradientBrush(
+                    new PointF(0, 0),
+                    new PointF(mw, 0),
+                    Color.FromArgb(255, 11, 7, 24),
+                    Color.FromArgb(15, 11, 7, 24)))
+                {
+                    var cb = new ColorBlend(4);
+                    cb.Positions = new[] { 0.0f, Math.Min(0.45f, seamCover + 0.08f), fadeEnd / mw, 1.0f };
+                    cb.Colors = new[] {
+                        Color.FromArgb(255, 11, 7, 24),
+                        Color.FromArgb(255, 11, 7, 24),
+                        Color.FromArgb(85, 16, 9, 36),
+                        Color.FromArgb(10, 11, 7, 24)
+                    };
+                    scrm.InterpolationColors = cb;
+                    g.FillRectangle(scrm, 0, 0, mw, mh);
+                }
+
+                // Subtle bottom & top atmospheric framing gradient
+                using (var vShade = new LinearGradientBrush(
+                    new PointF(0, 0),
+                    new PointF(0, mh),
+                    Color.FromArgb(120, 8, 4, 20),
+                    Color.FromArgb(150, 8, 4, 20)))
+                {
+                    var cb = new ColorBlend(3);
+                    cb.Positions = new[] { 0.0f, 0.45f, 1.0f };
+                    cb.Colors = new[] {
+                        Color.FromArgb(105, 8, 4, 20),
+                        Color.FromArgb(0, 8, 4, 20),
+                        Color.FromArgb(140, 8, 4, 20)
+                    };
+                    vShade.InterpolationColors = cb;
+                    g.FillRectangle(vShade, 0, 0, mw, mh);
+                }
+
+                // Full-bleed top synthwave prism horizon bar echoing the browser theme frame
+                float beamH = isMarquee ? 10f : 7f;
+                using (var topBeam = new LinearGradientBrush(
+                    new PointF(0, 0),
+                    new PointF(mw, 0),
+                    Color.FromArgb(0, 240, 255),
+                    Color.FromArgb(255, 42, 133)))
+                {
+                    var cb = new ColorBlend(3);
+                    cb.Positions = new[] { 0.0f, 0.52f, 1.0f };
+                    cb.Colors = new[] {
+                        Color.FromArgb(0, 240, 255),
+                        Color.FromArgb(181, 55, 242),
+                        Color.FromArgb(255, 42, 133)
+                    };
+                    topBeam.InterpolationColors = cb;
+                    g.FillRectangle(topBeam, 0, 0, mw, beamH);
+                }
+
+                // Subtle CRT scanline sheen across full canvas
+                using (var scanPen = new Pen(Color.FromArgb(18, 0, 0, 0), 1.5f))
+                {
+                    for (int sy = 12; sy < mh; sy += 6)
+                    {
+                        g.DrawLine(scanPen, 0, sy, mw, sy);
+                    }
+                }
+
+                float leftPad = isMarquee ? 150f : 48f;
+                float badgeY = isMarquee ? 210f : 94f;
+                float badgeH = isMarquee ? 60f : 40f;
+                float badgeW = isMarquee ? 360f : 220f;
+                var badgeRect = new RectangleF(leftPad, badgeY, badgeW, badgeH);
+
+                // Eyebrow badge pill
+                using (var badgePath = CreateRoundedRect(badgeRect, badgeH * 0.5f))
+                using (var badgeFill = new SolidBrush(Color.FromArgb(215, 14, 9, 34)))
+                using (var badgeStrokeBrush = new LinearGradientBrush(
+                    new PointF(badgeRect.Left, badgeRect.Top),
+                    new PointF(badgeRect.Right, badgeRect.Bottom),
+                    Color.FromArgb(0, 240, 255),
+                    Color.FromArgb(255, 42, 133)))
+                using (var badgePen = new Pen(badgeStrokeBrush, isMarquee ? 3.5f : 2.5f))
+                using (var badgeFont = new Font("Bahnschrift", isMarquee ? 23f : 15f, FontStyle.Bold, GraphicsUnit.Pixel))
+                using (var badgeTextBrush = new SolidBrush(Color.FromArgb(145, 248, 255)))
+                using (var sfCenter = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                {
+                    g.FillPath(badgeFill, badgePath);
+                    g.DrawPath(badgePen, badgePath);
+                    g.DrawString("CHROME THEME", badgeFont, badgeTextBrush, badgeRect, sfCenter);
+                }
+
+                // Main headline with subtle neon magenta/violet aura
+                float titleY = badgeY + badgeH + (isMarquee ? 34f : 20f);
+                string titleText = "NEON HORIZON";
+                using (var titleFont = new Font("Bahnschrift", isMarquee ? 132f : 60f, FontStyle.Bold, GraphicsUnit.Pixel))
+                using (var glowBrush = new SolidBrush(Color.FromArgb(85, 255, 42, 165)))
+                using (var cyanGlow = new SolidBrush(Color.FromArgb(65, 0, 240, 255)))
+                using (var titleBrush = new LinearGradientBrush(
+                    new PointF(0, titleY),
+                    new PointF(0, titleY + (isMarquee ? 136f : 62f)),
+                    Color.FromArgb(255, 255, 255),
+                    Color.FromArgb(215, 232, 255)))
+                {
+                    float gOff = isMarquee ? 4f : 2.2f;
+                    g.DrawString(titleText, titleFont, cyanGlow, leftPad - gOff, titleY - gOff * 0.5f);
+                    g.DrawString(titleText, titleFont, glowBrush, leftPad + gOff, titleY + gOff);
+                    g.DrawString(titleText, titleFont, titleBrush, leftPad, titleY);
+                }
+
+                // Synthwave gradient divider bar
+                float accentY = titleY + (isMarquee ? 152f : 74f);
+                float accentW = isMarquee ? 430f : 184f;
+                float accentH = isMarquee ? 8f : 4.5f;
+                using (var accentBrush = new LinearGradientBrush(
+                    new PointF(leftPad, accentY),
+                    new PointF(leftPad + accentW, accentY),
+                    Color.FromArgb(0, 240, 255),
+                    Color.FromArgb(255, 42, 133)))
+                {
+                    g.FillRectangle(accentBrush, leftPad, accentY, accentW, accentH);
+                }
+
+                // Subtitle & concise supporting line
+                float subY = accentY + (isMarquee ? 28f : 16f);
+                using (var subFont = new Font("Bahnschrift", isMarquee ? 45f : 24f, FontStyle.Bold, GraphicsUnit.Pixel))
+                using (var subBrush = new SolidBrush(Color.FromArgb(246, 178, 255)))
+                {
+                    g.DrawString("SYNTHWAVE DARK THEME", subFont, subBrush, leftPad, subY);
+                }
+
+                float tagY = subY + (isMarquee ? 68f : 38f);
+                string tagText = isMarquee
+                    ? "1980s Outrun Sunset  •  Glowing Neon Tabs  •  Deep Midnight Contrast"
+                    : "1980s Outrun Sunset & Neon UI";
+                using (var tagFont = new Font("Segoe UI", isMarquee ? 30f : 19f, FontStyle.Regular, GraphicsUnit.Pixel))
+                using (var tagBrush = new SolidBrush(Color.FromArgb(222, 212, 248)))
+                {
+                    g.DrawString(tagText, tagFont, tagBrush, leftPad, tagY);
+                }
+
+                using (var finalBmp = new Bitmap(width, height, PixelFormat.Format24bppRgb))
+                using (var fg = Graphics.FromImage(finalBmp))
+                {
+                    fg.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    fg.SmoothingMode = SmoothingMode.HighQuality;
+                    fg.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    fg.CompositingQuality = CompositingQuality.HighQuality;
+                    fg.DrawImage(master, new Rectangle(0, 0, width, height));
                     SavePng(finalBmp, outputPath);
                 }
             }
@@ -613,16 +922,19 @@ $cIncogTop     = [SynthwaveAssets.RgbColor]::new(5, 6, 16)
 $cIncogMid     = [SynthwaveAssets.RgbColor]::new(8, 8, 22)      # #080816 (colors.frame_incognito)
 $cIncogBot     = [SynthwaveAssets.RgbColor]::new(13, 17, 40)
 
-$cToolTop      = [SynthwaveAssets.RgbColor]::new(39, 20, 71)
+$cToolTop      = [SynthwaveAssets.RgbColor]::new(72, 26, 124)   # #481A7C (active tab glow peak)
 $cToolMid      = [SynthwaveAssets.RgbColor]::new(30, 16, 54)    # #1E1036 (colors.toolbar)
 $cToolBot      = [SynthwaveAssets.RgbColor]::new(23, 12, 44)
 
-$cTabBgTop      = [SynthwaveAssets.RgbColor]::new(36, 18, 66)
-$cTabBgMid      = [SynthwaveAssets.RgbColor]::new(20, 11, 40)    # #140B28 (colors.background_tab)
-$cTabBgBot      = [SynthwaveAssets.RgbColor]::new(16, 9, 34)
-$cTabInactTop  = [SynthwaveAssets.RgbColor]::new(28, 16, 52)
-$cTabInactMid  = [SynthwaveAssets.RgbColor]::new(19, 12, 37)    # #130C25 (colors.background_tab_inactive)
-$cTabInactBot  = [SynthwaveAssets.RgbColor]::new(16, 10, 32)
+$cTabBgTop      = [SynthwaveAssets.RgbColor]::new(50, 22, 96)   # #321660 (background tab top gradient)
+$cTabBgMid      = [SynthwaveAssets.RgbColor]::new(32, 16, 62)   # #20103E (colors.background_tab)
+$cTabBgBot      = [SynthwaveAssets.RgbColor]::new(20, 11, 42)
+$cTabInactTop  = [SynthwaveAssets.RgbColor]::new(36, 18, 70)
+$cTabInactMid  = [SynthwaveAssets.RgbColor]::new(26, 15, 50)    # #1A0F32 (colors.background_tab_inactive)
+$cTabInactBot  = [SynthwaveAssets.RgbColor]::new(17, 10, 34)
+
+$cWinCtrlTop   = [SynthwaveAssets.RgbColor]::new(74, 28, 132)
+$cWinCtrlLow   = [SynthwaveAssets.RgbColor]::new(24, 12, 48)
 
 $cNeonPink     = [SynthwaveAssets.RgbColor]::new(255, 42, 133)  # #FF2A85
 $cNeonViolet   = [SynthwaveAssets.RgbColor]::new(181, 55, 242)  # #B537F2
@@ -662,26 +974,36 @@ if (Test-Path (Join-Path $ChromeRoot 'extension\manifest.json')) {
 [SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay.png'), 760, 160, 1.0)
 [SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay_inactive.png'), 760, 160, 0.45)
 
-# 4. Active Tab + Toolbar strip (2400x140)
+# 4. Active Tab + Toolbar strip (2400x140): synthwave tab body gradient + bright top rim transitioning cleanly into #1E1036 toolbar
 [SynthwaveAssets.Generator]::BuildUiStrip(
     (Join-Path $imgDir 'theme_toolbar.png'),
-    2400, 140, $cToolTop, $cToolMid, $cToolBot, 0.24,
-    $cNeonCyan, $cNeonViolet, $cNeonPink, 0.52, 4, 0.025, 0, 0.0, 1988
+    2400, 140, $cToolTop, $cToolMid, $cToolBot, 0.29,
+    $cNeonCyan, $cNeonViolet, $cNeonPink, 0.90, 9, 0.025, 0, 0.0, 1988,
+    40.0, 0.30, 3
 )
 
-# 5. Background Tab strips (2400x100)
+# 5. Background Tab strips (2400x100): gradient capsule fill + highlighted top neon rim
 [SynthwaveAssets.Generator]::BuildUiStrip(
     (Join-Path $imgDir 'theme_tab_background.png'),
-    2400, 100, $cTabBgTop, $cTabBgMid, $cTabBgBot, 0.16,
-    $cNeonViolet, $cNeonPink, $cNeonCyan, 0.22, 3, 0.0, 0, 0.0, 1989
+    2400, 100, $cTabBgTop, $cTabBgMid, $cTabBgBot, 0.38,
+    $cNeonViolet, $cNeonPink, $cNeonCyan, 0.58, 7, 0.0, 0, 0.0, 1989,
+    36.0, 0.14, 3
 )
 [SynthwaveAssets.Generator]::BuildUiStrip(
     (Join-Path $imgDir 'theme_tab_background_inactive.png'),
-    2400, 100, $cTabInactTop, $cTabInactMid, $cTabInactBot, 0.16,
-    $cDeepBlue, $cNeonViolet, $cDeepBlue, 0.10, 2, 0.0, 0, 0.0, 1990
+    2400, 100, $cTabInactTop, $cTabInactMid, $cTabInactBot, 0.38,
+    $cDeepBlue, $cNeonViolet, $cDeepBlue, 0.30, 5, 0.0, 0, 0.0, 1990,
+    36.0, 0.08, 3
 )
 
-# 6. Extension / Theme Icons (16, 48, 128)
+# 6. Window Control Caption Buttons soft gradient underlay (360x80 transparent RGBA)
+[SynthwaveAssets.Generator]::BuildWindowControlBackground(
+    (Join-Path $imgDir 'theme_window_control_background.png'),
+    360, 80, $cWinCtrlTop, $cWinCtrlLow,
+    $cNeonViolet, $cNeonPink, $cNeonCyan, 40.0, 1
+)
+
+# 7. Extension / Theme Icons (16, 48, 128)
 foreach ($iconSize in @(16, 48, 128)) {
     [SynthwaveAssets.Generator]::BuildThemeIcon(
         (Join-Path $imgDir "icon$iconSize.png"),
@@ -689,4 +1011,26 @@ foreach ($iconSize in @(16, 48, 128)) {
     )
 }
 
-Write-Host "Successfully generated 12 theme PNG assets in $imgDir"
+# 8. Chrome Web Store listing assets (128x128 padded icon + 24-bit opaque promo tiles)
+$storeDir = Join-Path $ChromeRoot 'store'
+New-Item -ItemType Directory -Force -Path $storeDir | Out-Null
+
+# CWS Store Icon: 96x96 artwork with 16px transparent margin on all sides (64px at 512px master)
+[SynthwaveAssets.Generator]::BuildThemeIcon(
+    (Join-Path $storeDir 'store-icon-128.png'),
+    128, 64.0
+)
+
+# Small Promo Tile (440x280) & Marquee Promo Tile (1400x560)
+[SynthwaveAssets.Generator]::BuildPromoTile(
+    $sourceNtp,
+    (Join-Path $storeDir 'promo-small-440x280.png'),
+    440, 280, $false
+)
+[SynthwaveAssets.Generator]::BuildPromoTile(
+    $sourceNtp,
+    (Join-Path $storeDir 'promo-marquee-1400x560.png'),
+    1400, 560, $true
+)
+
+Write-Host "Successfully generated 13 theme PNG assets in $imgDir and 3 store PNG assets in $storeDir"
