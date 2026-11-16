@@ -162,29 +162,68 @@
   }
 
   function buildFilterGraph(settings, width, height) {
+    const curvNorm = settings.curvature / 100;
     const bloomNorm = settings.bloom / 100;
     const vhsNorm = settings.vhs / 100;
 
-    if (bloomNorm <= 0) {
+    if (curvNorm <= 0 && bloomNorm <= 0) {
       els.backdrop.style.backdropFilter = 'none';
       els.filterDefs.innerHTML = '';
       return;
     }
 
+    const cw = Math.max(40, Math.round(width * 0.26));
+    const ch = Math.max(40, Math.round(height * 0.28));
+    const rx = Math.max(0, width - cw);
+    const by = Math.max(0, height - ch);
+    const stdX = Math.max(32, Math.round(width * 0.22));
+    const stdY = Math.max(32, Math.round(height * 0.22));
+
+    // Bounded barrel scale keeps displaced coordinates strictly inside the rounded bezel cutout.
+    const dispScale = (curvNorm * 26).toFixed(1);
+    const aaStd = (0.12 + curvNorm * 0.30).toFixed(2);
     const bloomStd = (1.6 + bloomNorm * 3.8).toFixed(2);
     const bloomAlpha = (bloomNorm * 0.62).toFixed(3);
     const chromaBoost = (1.0 + vhsNorm * 0.18).toFixed(2);
 
-    // Keep base DOM text razor-sharp on websites (avoid nearest-neighbor feDisplacementMap artifacts);
-    // true bilinear CRT barrel distortion is rendered in WebGL2 on the custom New Tab page.
-    els.filterDefs.innerHTML = `
-      <filter id="nh-crt-filter" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse"
-        x="0" y="0" width="${width}" height="${height}" color-interpolation-filters="sRGB">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="${bloomStd}" result="bloomBlur"/>
+    let chainHtml = '';
+    let currentIn = 'SourceGraphic';
+
+    if (curvNorm > 0) {
+      chainHtml += `
+        <feFlood x="0" y="0" width="${width}" height="${height}" flood-color="rgb(128,128,0)" result="base"/>
+        <feFlood x="0" y="0" width="${cw}" height="${ch}" flood-color="rgb(0,0,0)" result="tl"/>
+        <feFlood x="${rx}" y="0" width="${cw}" height="${ch}" flood-color="rgb(255,0,0)" result="tr"/>
+        <feFlood x="0" y="${by}" width="${cw}" height="${ch}" flood-color="rgb(0,255,0)" result="bl"/>
+        <feFlood x="${rx}" y="${by}" width="${cw}" height="${ch}" flood-color="rgb(255,255,0)" result="br"/>
+        <feMerge result="field">
+          <feMergeNode in="base"/>
+          <feMergeNode in="tl"/>
+          <feMergeNode in="tr"/>
+          <feMergeNode in="bl"/>
+          <feMergeNode in="br"/>
+        </feMerge>
+        <feGaussianBlur in="field" stdDeviation="${stdX} ${stdY}" result="smooth"/>
+        <feDisplacementMap in="${currentIn}" in2="smooth" scale="${dispScale}" xChannelSelector="R" yChannelSelector="G" result="curvedRaw"/>
+        <feGaussianBlur in="curvedRaw" stdDeviation="${aaStd}" result="curved"/>
+      `;
+      currentIn = 'curved';
+    }
+
+    if (bloomNorm > 0) {
+      chainHtml += `
+        <feGaussianBlur in="${currentIn}" stdDeviation="${bloomStd}" result="bloomBlur"/>
         <feColorMatrix in="bloomBlur" type="matrix"
           values="${chromaBoost} 0 0 0 0  0 1.02 0 0 0  0 0 ${(1.12 + vhsNorm * 0.2).toFixed(2)} 0 0  0 0 0 ${bloomAlpha} 0"
           result="bloom"/>
-        <feBlend in="SourceGraphic" in2="bloom" mode="screen" result="bloomed"/>
+        <feBlend in="${currentIn}" in2="bloom" mode="screen" result="bloomed"/>
+      `;
+    }
+
+    els.filterDefs.innerHTML = `
+      <filter id="nh-crt-filter" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse"
+        x="0" y="0" width="${width}" height="${height}" color-interpolation-filters="sRGB">
+        ${chainHtml}
       </filter>
     `;
     els.backdrop.style.backdropFilter = 'url(#nh-crt-filter)';
@@ -194,8 +233,8 @@
    * Generates a C1-smooth continuous barrel-curved CRT aperture path matching the WebGL2 bezel.
    */
   function buildRoundedBarrelPath(width, height, curvNorm) {
-    const padMid = 1 + curvNorm * 1.5;
-    const cornerPull = curvNorm * 10;
+    const padMid = 1.5 + curvNorm * 2.5;
+    const cornerPull = curvNorm * 14;
     const radius = Math.min(Math.min(width, height) * 0.16, 4 + curvNorm * 22);
     const left = padMid;
     const right = width - padMid;

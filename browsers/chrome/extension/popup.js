@@ -43,7 +43,7 @@
     siteRow.hidden = isNewTabScope;
     newTabSyncRow.hidden = !isNewTabScope;
     newTabAnimBgRow.hidden = !isNewTabScope;
-    curvatureLabel.textContent = isNewTabScope ? 'Изгиб экрана (WebGL2)' : 'Рамка ЭЛТ (CRT)';
+    curvatureLabel.textContent = isNewTabScope ? 'Изгиб экрана (WebGL2)' : 'Изгиб экрана (CRT)';
 
     const profile = profileCtrl ? profileCtrl.render() : state;
     document.body.classList.toggle('is-disabled', !profile.enabled);
