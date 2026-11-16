@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Neon Horizon — CRT & VHS Shader",
+  "version": "1.0.0",
+  "description": "Retro CRT curvature, interlaced scanlines, phosphor bloom glow, and analog VHS shader overlay with live intensity controls.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "topSites"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Neon Horizon — CRT & VHS Shader",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "toggle-shader": {
+      "suggested_key": {
+        "default": "Alt+Shift+V"
+      },
+      "description": "Toggle CRT & VHS shader on/off"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["shared/defaults.js", "content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

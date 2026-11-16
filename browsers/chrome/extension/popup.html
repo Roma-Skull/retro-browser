@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Horizon — CRT &amp; VHS Shader</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="panel" id="popup-panel">
+    <header class="header">
+      <div class="brand">
+        <img src="icons/icon48.png" alt="" class="logo" />
+        <div>
+          <div class="title">NEON HORIZON</div>
+          <div class="subtitle">CRT &amp; VHS Shader</div>
+        </div>
+      </div>
+      <label class="power-switch" title="Включить или выключить шейдер (Alt+Shift+V)">
+        <input type="checkbox" id="toggle-enabled" data-role="toggle-enabled" />
+        <span class="power-track">
+          <span class="power-thumb"></span>
+        </span>
+      </label>
+    </header>
+
+    <div class="scope-tabs" role="tablist" aria-label="Профиль настроек">
+      <button id="scope-sites" class="scope-tab active" data-scope="sites" type="button" role="tab" aria-selected="true">На сайтах</button>
+      <button id="scope-newtab" class="scope-tab" data-scope="newtab" type="button" role="tab" aria-selected="false">Новая вкладка</button>
+    </div>
+
+    <div class="site-row" id="site-row">
+      <button id="toggle-site" class="site-btn" type="button">
+        <span class="site-dot"></span>
+        <span id="site-label">Проверка вкладки...</span>
+      </button>
+    </div>
+
+    <div class="sync-row" id="newtab-sync-row" hidden>
+      <label class="sync-check" title="Использовать на новой вкладке те же настройки, что и для сайтов">
+        <input type="checkbox" id="popup-sync-sites" />
+        <span>Синхр. с сайтами</span>
+      </label>
+      <button type="button" id="popup-copy-sites" class="copy-btn" title="Скопировать настройки с сайтов">Копия</button>
+    </div>
+
+    <div class="bg-anim-row" id="newtab-animbg-row" hidden>
+      <label class="sync-check" title="Движение неоновой сетки, мерцание звёзд и пульсация солнца">
+        <input type="checkbox" id="popup-animate-bg" />
+        <span>Живой фон (полёт над сеткой)</span>
+      </label>
+    </div>
+
+    <section class="presets" aria-label="Пресеты">
+      <button class="preset-btn" data-preset="soft" type="button">Soft CRT</button>
+      <button class="preset-btn" data-preset="outrun" type="button">Outrun 84</button>
+      <button class="preset-btn" data-preset="vhs" type="button">VHS Tape</button>
+      <button class="preset-btn" data-preset="minimal" type="button">Minimal</button>
+    </section>
+
+    <section class="sliders">
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-curvature" id="label-curvature">Рамка ЭЛТ (CRT)</label>
+          <span class="val" id="val-curvature" data-val="curvature">25%</span>
+        </div>
+        <input type="range" id="slider-curvature" data-slider="curvature" min="0" max="100" value="25" />
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-scanlines">Чересстрочный сканлайн</label>
+          <span class="val" id="val-scanlines" data-val="scanlines">28%</span>
+        </div>
+        <input type="range" id="slider-scanlines" data-slider="scanlines" min="0" max="100" value="28" />
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-bloom">Свечение ЭЛТ (Bloom)</label>
+          <span class="val" id="val-bloom" data-val="bloom">32%</span>
+        </div>
+        <input type="range" id="slider-bloom" data-slider="bloom" min="0" max="100" value="32" />
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-vhs">VHS-лента и хроматика</label>
+          <span class="val" id="val-vhs" data-val="vhs">22%</span>
+        </div>
+        <input type="range" id="slider-vhs" data-slider="vhs" min="0" max="100" value="22" />
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-vignette">Стекло и виньетка</label>
+          <span class="val" id="val-vignette" data-val="vignette">35%</span>
+        </div>
+        <input type="range" id="slider-vignette" data-slider="vignette" min="0" max="100" value="35" />
+      </div>
+    </section>
+
+    <footer class="footer">
+      <label class="anim-toggle">
+        <input type="checkbox" id="toggle-animate" data-role="toggle-animate" />
+        <span>Анимация развёртки</span>
+      </label>
+      <button id="btn-reset" data-role="reset-btn" class="reset-btn" type="button">Сброс</button>
+    </footer>
+
+    <div class="hotkey-hint">Быстрое переключение: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></div>
+  </div>
+
+  <script src="shared/defaults.js"></script>
+  <script src="shared/controls.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

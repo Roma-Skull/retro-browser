@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Новая вкладка — Neon Horizon</title>
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/icon48.png" />
+  <link rel="stylesheet" href="newtab.css" />
+</head>
+<body>
+  <div id="bg-fallback" aria-hidden="true"></div>
+  <canvas id="crt-bg" aria-hidden="true"></canvas>
+
+  <main class="stage">
+    <header class="hero-top">
+      <div class="clock-wrap">
+        <div id="clock-time" class="clock-time">00:00</div>
+        <div id="clock-date" class="clock-date"></div>
+      </div>
+
+      <form id="search-form" class="search-bar" autocomplete="off">
+        <button type="button" id="engine-btn" class="engine-btn" title="Сменить поисковую систему">Google</button>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Поиск или адрес сайта..."
+          aria-label="Поиск или адрес сайта"
+          autofocus
+        />
+        <button type="submit" class="search-submit" title="Найти">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="20" y1="20" x2="16.2" y2="16.2"></line>
+          </svg>
+        </button>
+      </form>
+
+      <section class="sites-section" aria-label="Быстрые сайты">
+        <div id="sites-grid" class="sites-grid"></div>
+      </section>
+    </header>
+  </main>
+
+  <!-- Floating CRT/VHS Shader Configuration Button & Drawer -->
+  <div class="shader-dock">
+    <section id="crt-drawer" class="crt-drawer" hidden aria-label="Настройки CRT и VHS для новой вкладки">
+      <div class="drawer-head">
+        <div>
+          <div class="drawer-title">CRT / VHS ФОНА</div>
+          <div class="drawer-sub">WebGL2 шейдер новой вкладки</div>
+        </div>
+        <label class="power-switch" title="Включить или выключить шейдер новой вкладки">
+          <input type="checkbox" data-role="toggle-enabled" />
+          <span class="power-track"><span class="power-thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="sync-row">
+        <label class="sync-check" title="Использовать на новой вкладке те же настройки, что и для сайтов">
+          <input type="checkbox" id="toggle-sync-sites" />
+          <span>Синхр. с сайтами</span>
+        </label>
+        <button type="button" id="btn-copy-sites" class="copy-btn" title="Скопировать текущие настройки с сайтов">Копия</button>
+      </div>
+
+      <div class="bg-anim-row">
+        <label class="sync-check" title="Движение неоновой сетки, мерцание звёзд и пульсация солнца">
+          <input type="checkbox" id="toggle-animate-bg" />
+          <span>Живой фон (полёт над сеткой)</span>
+        </label>
+      </div>
+
+      <div class="presets">
+        <button class="preset-btn" data-preset="soft" type="button">Soft CRT</button>
+        <button class="preset-btn" data-preset="outrun" type="button">Outrun 84</button>
+        <button class="preset-btn" data-preset="vhs" type="button">VHS Tape</button>
+        <button class="preset-btn" data-preset="minimal" type="button">Minimal</button>
+      </div>
+
+      <div class="sliders">
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="nt-curvature">Изгиб экрана (CRT)</label>
+            <span class="val" data-val="curvature">48%</span>
+          </div>
+          <input type="range" id="nt-curvature" data-slider="curvature" min="0" max="100" value="48" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="nt-scanlines">Чересстрочный сканлайн</label>
+            <span class="val" data-val="scanlines">45%</span>
+          </div>
+          <input type="range" id="nt-scanlines" data-slider="scanlines" min="0" max="100" value="45" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="nt-bloom">Свечение ЭЛТ (Bloom)</label>
+            <span class="val" data-val="bloom">58%</span>
+          </div>
+          <input type="range" id="nt-bloom" data-slider="bloom" min="0" max="100" value="58" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="nt-vhs">VHS-лента и хроматика</label>
+            <span class="val" data-val="vhs">38%</span>
+          </div>
+          <input type="range" id="nt-vhs" data-slider="vhs" min="0" max="100" value="38" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="nt-vignette">Стекло и виньетка</label>
+            <span class="val" data-val="vignette">55%</span>
+          </div>
+          <input type="range" id="nt-vignette" data-slider="vignette" min="0" max="100" value="55" />
+        </div>
+      </div>
+
+      <div class="drawer-foot">
+        <label class="anim-toggle">
+          <input type="checkbox" data-role="toggle-animate" />
+          <span>Анимация развёртки</span>
+        </label>
+        <button type="button" class="reset-btn" data-role="reset-btn">Сброс</button>
+      </div>
+    </section>
+
+    <button type="button" id="btn-toggle-drawer" class="dock-btn" aria-expanded="false">
+      <span id="dock-dot" class="dock-dot"></span>
+      <span>CRT / VHS</span>
+    </button>
+  </div>
+
+  <!-- Add Quick Site Modal -->
+  <div id="add-modal" class="modal-backdrop" hidden>
+    <form id="add-site-form" class="modal-card" autocomplete="off">
+      <div class="modal-title">Добавить быстрый сайт</div>
+      <label class="field-label">
+        <span>Название</span>
+        <input type="text" id="add-title" placeholder="Например: GitHub" maxlength="32" required />
+      </label>
+      <label class="field-label">
+        <span>Адрес (URL)</span>
+        <input type="text" id="add-url" placeholder="https://github.com" required />
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="btn-cancel-add" class="btn-secondary">Отмена</button>
+        <button type="submit" class="btn-primary">Добавить</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="shared/defaults.js"></script>
+  <script src="shared/controls.js"></script>
+  <script src="newtab.js"></script>
+</body>
+</html>

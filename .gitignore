@@ -1,0 +1,13 @@
+# Built distribution packages (generated locally via package scripts)
+dist/
+
+# Chrome local runtime theme cache & packing outputs
+**/Cached Theme.pak
+*.pak
+*.crx
+*.pem
+
+# OS & editor artifacts
+Thumbs.db
+.DS_Store
+*.log
