@@ -6,6 +6,8 @@
   const { STORAGE_KEY, DEFAULT_SETTINGS, normalizeSettings } = globalThis.NeonHorizonDefaults;
   const HOST_TAG = 'nh-crt-shader';
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  const GRAIN_FRAME_INTERVAL_MS = 84;
+  const IS_LITTLE_ENDIAN = new Uint8Array(new Uint32Array([0x11223344]).buffer)[0] === 0x44;
 
   let currentSettings = normalizeSettings(DEFAULT_SETTINGS);
   let hostEl = null;
@@ -16,6 +18,13 @@
   let lastGrainTime = 0;
   let grainCtx = null;
   let grainImg = null;
+  let grainBuf32 = null;
+  let grainSeed = 0x9e3779b9;
+  let lastFilterKey = '';
+  let lastBezelKey = '';
+  let lastScanKey = '';
+  let lastVhsKey = '';
+  let hasStaticGrain = false;
   let isMounted = false;
 
   function isHostDisabled(settings) {
@@ -56,7 +65,7 @@
             pointer-events: none;
           }
           #backdrop {
-            will-change: backdrop-filter;
+            display: none;
           }
           #scanlines {
             opacity: 0;
@@ -65,16 +74,17 @@
             animation: nh-interlace 0.12s steps(2, end) infinite;
           }
           #sweep {
-            height: 90px;
+            height: 96px;
             inset: auto 0 auto 0;
-            top: -90px;
+            top: -96px;
             left: 0;
             right: 0;
             background: linear-gradient(
               to bottom,
               transparent 0%,
-              rgba(0, 240, 255, 0.045) 45%,
-              rgba(255, 42, 133, 0.03) 60%,
+              rgba(0, 240, 255, 0.20) 38%,
+              rgba(185, 250, 255, 0.28) 50%,
+              rgba(255, 42, 133, 0.16) 66%,
               transparent 100%
             );
             opacity: 0;
@@ -92,15 +102,15 @@
             opacity: 0;
           }
           #vhs-tracking {
-            height: 28px;
+            height: 30px;
             left: 0;
             right: 0;
-            top: -28px;
+            top: -30px;
             background: linear-gradient(
               to bottom,
               transparent 0%,
-              rgba(255, 42, 133, 0.08) 35%,
-              rgba(0, 240, 255, 0.11) 65%,
+              rgba(255, 42, 133, 0.18) 35%,
+              rgba(0, 240, 255, 0.24) 65%,
               transparent 100%
             );
             opacity: 0;
@@ -158,6 +168,7 @@
 
     grainCtx = els.vhsGrain.getContext('2d', { alpha: true });
     grainImg = grainCtx.createImageData(128, 128);
+    grainBuf32 = new Uint32Array(grainImg.data.buffer);
     isMounted = true;
   }
 
@@ -166,8 +177,16 @@
     const bloomNorm = settings.bloom / 100;
     const vhsNorm = settings.vhs / 100;
 
+    const filterKey = curvNorm <= 0 && bloomNorm <= 0
+      ? 'none'
+      : `${curvNorm}|${bloomNorm}|${vhsNorm}|${width}|${height}`;
+    if (filterKey === lastFilterKey) return;
+    lastFilterKey = filterKey;
+
     if (curvNorm <= 0 && bloomNorm <= 0) {
       els.backdrop.style.backdropFilter = 'none';
+      els.backdrop.style.willChange = 'auto';
+      els.backdrop.style.display = 'none';
       els.filterDefs.innerHTML = '';
       return;
     }
@@ -226,6 +245,8 @@
         ${chainHtml}
       </filter>
     `;
+    els.backdrop.style.display = 'block';
+    els.backdrop.style.willChange = 'backdrop-filter';
     els.backdrop.style.backdropFilter = 'url(#nh-crt-filter)';
   }
 
@@ -301,10 +322,18 @@
     const curvNorm = settings.curvature / 100;
     const vigNorm = settings.vignette / 100;
 
+    const bezelKey = curvNorm <= 0 && vigNorm <= 0
+      ? 'none'
+      : `${curvNorm}|${vigNorm}|${width}|${height}`;
+    if (bezelKey === lastBezelKey) return;
+    lastBezelKey = bezelKey;
+
     if (curvNorm <= 0 && vigNorm <= 0) {
+      els.bezelSvg.style.display = 'none';
       els.bezelSvg.innerHTML = '';
       return;
     }
+    els.bezelSvg.style.display = 'block';
 
     const vigMidAlpha = (vigNorm * 0.44).toFixed(3);
     const vigEdgeAlpha = (vigNorm * 0.88).toFixed(3);
@@ -360,18 +389,39 @@
       grainRafId = 0;
       return;
     }
-    if (now - lastGrainTime >= 75) {
+    if (now - lastGrainTime >= GRAIN_FRAME_INTERVAL_MS) {
       lastGrainTime = now;
-      const data = grainImg.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const luma = (Math.random() * 255) | 0;
-        const tintShift = Math.random();
-        data[i] = tintShift > 0.65 ? Math.min(255, luma + 35) : luma;
-        data[i + 1] = luma;
-        data[i + 2] = tintShift < 0.35 ? Math.min(255, luma + 40) : luma;
-        data[i + 3] = luma > 175 ? 95 : 8;
+      let s = grainSeed | 0;
+      if (IS_LITTLE_ENDIAN && grainBuf32) {
+        const buf = grainBuf32;
+        for (let i = 0; i < buf.length; i++) {
+          s ^= s << 13;
+          s ^= s >>> 17;
+          s ^= s << 5;
+          const luma = s & 0xff;
+          const tint = (s >>> 8) & 0xff;
+          const r = tint > 166 ? (luma > 220 ? 255 : luma + 35) : luma;
+          const b = tint < 89 ? (luma > 215 ? 255 : luma + 40) : luma;
+          const a = luma > 175 ? 95 : 8;
+          buf[i] = (a << 24) | (b << 16) | (luma << 8) | r;
+        }
+      } else {
+        const data = grainImg.data;
+        for (let i = 0; i < data.length; i += 4) {
+          s ^= s << 13;
+          s ^= s >>> 17;
+          s ^= s << 5;
+          const luma = s & 0xff;
+          const tint = (s >>> 8) & 0xff;
+          data[i] = tint > 166 ? (luma > 220 ? 255 : luma + 35) : luma;
+          data[i + 1] = luma;
+          data[i + 2] = tint < 89 ? (luma > 215 ? 255 : luma + 40) : luma;
+          data[i + 3] = luma > 175 ? 95 : 8;
+        }
       }
+      grainSeed = s;
       grainCtx.putImageData(grainImg, 0, 0);
+      hasStaticGrain = false;
     }
     grainRafId = requestAnimationFrame(renderGrainFrame);
   }
@@ -402,9 +452,19 @@
 
     if (!active) {
       els.backdrop.style.backdropFilter = 'none';
+      els.backdrop.style.willChange = 'auto';
+      els.backdrop.style.display = 'none';
       els.scanlines.classList.remove('animating');
+      els.scanlines.style.display = 'none';
+      els.sweep.style.opacity = '0';
+      els.sweep.style.display = 'none';
       els.sweep.classList.remove('animating');
+      els.vhsTint.style.display = 'none';
+      els.vhsGrain.style.display = 'none';
+      els.vhsTracking.style.opacity = '0';
+      els.vhsTracking.style.display = 'none';
       els.vhsTracking.classList.remove('animating');
+      lastFilterKey = '';
       syncAnimationLoop();
       return;
     }
@@ -415,9 +475,10 @@
     buildFilterGraph(currentSettings, width, height);
     buildBezelAndVignette(currentSettings, width, height);
 
-    // Scanlines & RGB subpixel grille snapped to integer physical device pixels (prevents DPI moiré)
+    // Scanlines & RGB subpixel grille snapped to integer physical device pixels (+50% width, zero moire)
     const dpr = Math.max(0.5, window.devicePixelRatio || 1);
-    let physPeriod = Math.max(4, Math.round(3.2 * dpr));
+    const effectiveScale = Math.max(dpr, (height * dpr) / 1080);
+    let physPeriod = Math.max(6, Math.round(6.75 * effectiveScale));
     if (physPeriod % 2 !== 0) physPeriod += 1;
     const cssHalf = ((physPeriod / 2) / dpr).toFixed(4);
     const cssPeriod = (physPeriod / dpr).toFixed(4);
@@ -429,49 +490,77 @@
     const c4 = (colCss * 4).toFixed(4);
 
     const scanNorm = currentSettings.scanlines / 100;
-    const scanAlpha = (scanNorm * 0.44).toFixed(3);
-    const maskAlpha = (scanNorm * 0.065).toFixed(3);
-    els.scanlines.style.opacity = scanNorm > 0 ? '1' : '0';
-    els.scanlines.style.background = `
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent ${cssHalf}px,
-        rgba(4, 1, 14, ${scanAlpha}) ${cssHalf}px,
-        rgba(4, 1, 14, ${scanAlpha}) ${cssPeriod}px
-      ),
-      repeating-linear-gradient(
-        to right,
-        rgba(255, 42, 133, ${maskAlpha}) 0px,
-        rgba(40, 255, 190, ${maskAlpha}) ${c1}px,
-        rgba(0, 195, 255, ${maskAlpha}) ${c2}px,
-        transparent ${c3}px,
-        transparent ${c4}px
-      )
-    `;
+    if (scanNorm > 0) {
+      els.scanlines.style.display = 'block';
+      els.scanlines.style.opacity = '1';
+      const scanKey = `${scanNorm}|${physPeriod}|${colCss}`;
+      if (scanKey !== lastScanKey) {
+        lastScanKey = scanKey;
+        const scanAlpha = (scanNorm * 0.44).toFixed(3);
+        const maskAlpha = (scanNorm * 0.065).toFixed(3);
+        els.scanlines.style.background = `
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent ${cssHalf}px,
+            rgba(4, 1, 14, ${scanAlpha}) ${cssHalf}px,
+            rgba(4, 1, 14, ${scanAlpha}) ${cssPeriod}px
+          ),
+          repeating-linear-gradient(
+            to right,
+            rgba(255, 42, 133, ${maskAlpha}) 0px,
+            rgba(40, 255, 190, ${maskAlpha}) ${c1}px,
+            rgba(0, 195, 255, ${maskAlpha}) ${c2}px,
+            transparent ${c3}px,
+            transparent ${c4}px
+          )
+        `;
+      }
+    } else {
+      els.scanlines.style.opacity = '0';
+      els.scanlines.style.display = 'none';
+    }
 
     // VHS chromatic edge tint, tracking sweep, and analog tape grain
     const vhsNorm = currentSettings.vhs / 100;
-    const edgePink = (vhsNorm * 0.14).toFixed(3);
-    const edgeCyan = (vhsNorm * 0.16).toFixed(3);
-    els.vhsTint.style.opacity = vhsNorm > 0 ? '1' : '0';
-    els.vhsTint.style.background = `
-      radial-gradient(ellipse at center, transparent 54%, rgba(255, 42, 133, ${edgePink}) 86%, rgba(0, 240, 255, ${edgeCyan}) 100%),
-      linear-gradient(90deg, rgba(255, 42, 133, ${(vhsNorm * 0.045).toFixed(3)}) 0%, transparent 10%, transparent 90%, rgba(0, 240, 255, ${(vhsNorm * 0.045).toFixed(3)}) 100%)
-    `;
-    els.vhsGrain.style.opacity = (vhsNorm * 0.11).toFixed(3);
+    if (vhsNorm > 0) {
+      els.vhsTint.style.display = 'block';
+      els.vhsTint.style.opacity = '1';
+      els.vhsGrain.style.display = 'block';
+      els.vhsGrain.style.opacity = (vhsNorm * 0.11).toFixed(3);
+      const vhsKey = `${vhsNorm}`;
+      if (vhsKey !== lastVhsKey) {
+        lastVhsKey = vhsKey;
+        const edgePink = (vhsNorm * 0.14).toFixed(3);
+        const edgeCyan = (vhsNorm * 0.16).toFixed(3);
+        els.vhsTint.style.background = `
+          radial-gradient(ellipse at center, transparent 54%, rgba(255, 42, 133, ${edgePink}) 86%, rgba(0, 240, 255, ${edgeCyan}) 100%),
+          linear-gradient(90deg, rgba(255, 42, 133, ${(vhsNorm * 0.045).toFixed(3)}) 0%, transparent 10%, transparent 90%, rgba(0, 240, 255, ${(vhsNorm * 0.045).toFixed(3)}) 100%)
+        `;
+      }
+    } else {
+      els.vhsTint.style.opacity = '0';
+      els.vhsTint.style.display = 'none';
+      els.vhsGrain.style.opacity = '0';
+      els.vhsGrain.style.display = 'none';
+    }
 
+    const sweepNorm = currentSettings.sweep / 100;
     const animateInterlace = currentSettings.animate && scanNorm > 0;
-    const animateTracking = currentSettings.animate && vhsNorm > 0.12;
+    const animateSweep = currentSettings.animate && sweepNorm > 0;
+    const animateTracking = currentSettings.animate && vhsNorm > 0.12 && sweepNorm > 0;
     els.scanlines.classList.toggle('animating', animateInterlace);
-    els.sweep.style.opacity = animateInterlace ? '1' : '0';
-    els.sweep.classList.toggle('animating', animateInterlace);
-    els.vhsTracking.style.setProperty('--nh-track-op', (vhsNorm * 0.85).toFixed(2));
-    els.vhsTracking.style.opacity = animateTracking ? (vhsNorm * 0.85).toFixed(2) : '0';
+    els.sweep.style.display = animateSweep ? 'block' : 'none';
+    els.sweep.style.opacity = animateSweep ? sweepNorm.toFixed(3) : '0';
+    els.sweep.classList.toggle('animating', animateSweep);
+    const trackOp = (Math.min(1, vhsNorm * 0.55 + sweepNorm * 0.45)).toFixed(2);
+    els.vhsTracking.style.setProperty('--nh-track-op', trackOp);
+    els.vhsTracking.style.display = animateTracking ? 'block' : 'none';
+    els.vhsTracking.style.opacity = animateTracking ? trackOp : '0';
     els.vhsTracking.classList.toggle('animating', animateTracking);
 
     // Draw one initial static noise frame when animation is off but vhs > 0
-    if (vhsNorm > 0 && !currentSettings.animate) {
+    if (vhsNorm > 0 && !currentSettings.animate && !hasStaticGrain) {
       const data = grainImg.data;
       for (let i = 0; i < data.length; i += 4) {
         const l = ((i * 37) % 255);
@@ -481,6 +570,7 @@
         data[i + 3] = l > 180 ? 80 : 20;
       }
       grainCtx.putImageData(grainImg, 0, 0);
+      hasStaticGrain = true;
     }
 
     syncAnimationLoop();

@@ -37,7 +37,7 @@ retro-browser/
      - **Стекло и виньетка**;
      - быстрое включение/выключение по `Alt + Shift + V` и исключения по доменам.
    - **Живая Новая вкладка (`newtab.html`):**
-     - двухпроходный **WebGL2 GLSL-шейдер**: процедурная анимированная синтвейв-сцена (полёт над бесконечной неоновой сеткой, закатное Outrun-солнце со сползающими полосами, каркасные горы и мерцающие звёзды) + аппаратный ЭЛТ-изгиб (`gl.LINEAR`), Bloom, VHS, сканлайны и виньетка;
+     - оптимизированный многопроходный **WebGL2 GLSL-шейдер (24 FPS)**: процедурная анимированная синтвейв-сцена в масштабе `60%` с кэшем дальнего фона (`bgCacheFbo`, обновление раз в 4 кадра), вынесенным низкоразрешённым проходом **Bloom** (`1/9` разрешения сцены, пропуск при `0%`), скоростью сетки `50%` и нативным проходом CRT/VHS с тригонометрически-свободными сканлайнами (`+50%` ширины) и виньеткой;
      - строка поиска (`Google`, `Яндекс`, `DuckDuckGo`, `Bing` или прямой ввод URL), часы и плитки быстрых сайтов (`topSites` + пользовательские закладки);
      - отдельный профиль настроек для новой вкладки с переключателями **«Синхр. с сайтами»** и **«Живой фон (полёт над сеткой)»** как в попапе расширения, так и в кнопке **CRT / VHS** на самой новой вкладке.
 
@@ -54,7 +54,7 @@ retro-browser/
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File browsers\chrome\scripts\generate_assets.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File browsers\chrome\scripts\package.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File browsers\chrome\scripts\package.ps1 -Release
 ```
 
-Готовые архивы сохраняются в `dist/chrome/` (`neon-horizon-synthwave-theme.zip` и `neon-horizon-crt-vhs-shader.zip`).
+Готовые архивы сохраняются в `dist/chrome/` (`neon-horizon-synthwave-theme.zip`, `neon-horizon-crt-vhs-shader.zip`) и релизные пакеты (`.zip`, `.crx`, `SHA256SUMS.txt`) в `dist/chrome/releases/`.

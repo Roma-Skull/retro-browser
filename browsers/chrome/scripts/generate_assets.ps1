@@ -10,7 +10,9 @@
 [CmdletBinding()]
 param(
     [string]$ChromeRoot,
-    [string]$RepoRoot
+    [string]$RepoRoot,
+    [ValidateSet('All', 'Theme', 'Extension')]
+    [string]$Target = 'All'
 )
 
 Set-StrictMode -Version Latest
@@ -148,10 +150,10 @@ namespace SynthwaveAssets
             int waveCycles)
         {
             int cycles = Math.Max(1, waveCycles);
-            using (var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+            using (var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             {
                 var rect = new Rectangle(0, 0, width, height);
-                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                 int stride = data.Stride;
                 byte[] buf = new byte[stride * height];
 
@@ -228,11 +230,10 @@ namespace SynthwaveAssets
 
                         // Subtle ordered dithering prevents banding on dark gradients
                         double dither = (Bayer4x4[y & 3, x & 3] / 16.0 - 0.5) * 0.9;
-                        int idx = rowOffset + x * 4;
+                        int idx = rowOffset + x * 3;
                         buf[idx + 0] = ClampByte(b + dither);
                         buf[idx + 1] = ClampByte(g + dither);
                         buf[idx + 2] = ClampByte(r + dither);
-                        buf[idx + 3] = 255;
                     }
                 }
 
@@ -255,10 +256,10 @@ namespace SynthwaveAssets
             int waveCycles)
         {
             int cycles = Math.Max(1, waveCycles);
-            using (var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+            using (var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             {
                 var rect = new Rectangle(0, 0, width, height);
-                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                 int stride = data.Stride;
                 byte[] buf = new byte[stride * height];
 
@@ -358,7 +359,7 @@ namespace SynthwaveAssets
             int seed)
         {
             using (var src = new Bitmap(sourcePath))
-            using (var scaled = new Bitmap(targetWidth, targetHeight, PixelFormat.Format32bppArgb))
+            using (var scaled = new Bitmap(targetWidth, targetHeight, PixelFormat.Format24bppRgb))
             {
                 using (var g = Graphics.FromImage(scaled))
                 {
@@ -370,7 +371,7 @@ namespace SynthwaveAssets
                 }
 
                 var rect = new Rectangle(0, 0, targetWidth, targetHeight);
-                var data = scaled.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                var data = scaled.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
                 int stride = data.Stride;
                 byte[] buf = new byte[stride * targetHeight];
                 Marshal.Copy(data.Scan0, buf, 0, buf.Length);
@@ -412,8 +413,15 @@ namespace SynthwaveAssets
                 {
                     // Seamless blend into ntp_background at top edge (0..135px)
                     double keepTop = SmoothStep(0.0, 135.0, y);
-                    // Subtle micro-CRT scanline across lower horizon/grid area
-                    double scanMul = (y > targetHeight * 0.56 && (y % 2 == 1)) ? 0.965 : 1.0;
+                    // Subtle moire-free 6px bell-curve CRT scanline across lower horizon/grid area
+                    double scanMul = 1.0;
+                    if (y > targetHeight * 0.56)
+                    {
+                        double phase = (y % 6) / 6.0;
+                        double wBell = Math.Abs(phase * 2.0 - 1.0);
+                        double waveY = wBell * wBell * (3.0 - 2.0 * wBell);
+                        scanMul = 1.0 - 0.032 * (1.0 - waveY);
+                    }
 
                     int rowOffset = y * stride;
                     for (int x = 0; x < targetWidth; x++)
@@ -423,7 +431,7 @@ namespace SynthwaveAssets
                         double keepRight = SmoothStep(0.0, 60.0, (targetWidth - 1) - x);
                         double keep = keepTop * Math.Min(keepLeft, keepRight);
 
-                        int idx = rowOffset + x * 4;
+                        int idx = rowOffset + x * 3;
                         double b = buf[idx + 0] * scanMul;
                         double g = buf[idx + 1] * scanMul;
                         double r = buf[idx + 2] * scanMul;
@@ -449,7 +457,6 @@ namespace SynthwaveAssets
                         buf[idx + 0] = ClampByte(b + dither);
                         buf[idx + 1] = ClampByte(g + dither);
                         buf[idx + 2] = ClampByte(r + dither);
-                        buf[idx + 3] = 255;
                     }
                 }
 
@@ -473,10 +480,15 @@ namespace SynthwaveAssets
 
         public static void BuildThemeIcon(string outputPath, int size)
         {
-            BuildThemeIcon(outputPath, size, 18f);
+            BuildThemeIcon(outputPath, size, 18f, false);
         }
 
         public static void BuildThemeIcon(string outputPath, int size, float padAt512)
+        {
+            BuildThemeIcon(outputPath, size, padAt512, false);
+        }
+
+        public static void BuildThemeIcon(string outputPath, int size, float padAt512, bool crtShaderOverlay)
         {
             if (size <= 24)
             {
@@ -673,6 +685,46 @@ namespace SynthwaveAssets
                         }
                     }
 
+                    if (crtShaderOverlay)
+                    {
+                        // CRT scanlines, phosphor edge vignette & curved glass sheen
+                        using (var scanPen = new Pen(Color.FromArgb(42, 4, 1, 14), 2.8f * s))
+                        {
+                            for (float sy = oy + 4f * s; sy < oy + cardSize; sy += 8f * s)
+                            {
+                                g.DrawLine(scanPen, ox, sy, ox + cardSize, sy);
+                            }
+                        }
+                        using (var trackingBand = new LinearGradientBrush(
+                            new PointF(0, oy + cardSize * 0.20f),
+                            new PointF(0, oy + cardSize * 0.27f),
+                            Color.FromArgb(0, 0, 240, 255),
+                            Color.FromArgb(0, 255, 42, 133)))
+                        {
+                            var tcb = new ColorBlend(3);
+                            tcb.Positions = new[] { 0.0f, 0.5f, 1.0f };
+                            tcb.Colors = new[] {
+                                Color.FromArgb(0, 0, 240, 255),
+                                Color.FromArgb(48, 0, 240, 255),
+                                Color.FromArgb(0, 255, 42, 133)
+                            };
+                            trackingBand.InterpolationColors = tcb;
+                            g.FillRectangle(trackingBand, ox, oy + cardSize * 0.20f, cardSize, cardSize * 0.07f);
+                        }
+                        using (var glassSheen = new LinearGradientBrush(
+                            new PointF(ox, oy),
+                            new PointF(ox + cardSize * 0.65f, oy + cardSize * 0.65f),
+                            Color.FromArgb(46, 255, 255, 255),
+                            Color.FromArgb(0, 0, 240, 255)))
+                        {
+                            g.FillRectangle(glassSheen, cardRect);
+                        }
+                        using (var vigPen = new Pen(Color.FromArgb(95, 2, 0, 10), 26f * s))
+                        {
+                            g.DrawPath(vigPen, cardPath);
+                        }
+                    }
+
                     g.ResetClip();
                 }
 
@@ -702,6 +754,32 @@ namespace SynthwaveAssets
         }
 
         public static void BuildPromoTile(string sourcePath, string outputPath, int width, int height, bool isMarquee)
+        {
+            BuildPromoTile(
+                sourcePath,
+                outputPath,
+                width,
+                height,
+                isMarquee,
+                "CHROME THEME",
+                "SYNTHWAVE DARK THEME",
+                isMarquee
+                    ? "1980s Outrun Sunset  •  Glowing Neon Tabs  •  Deep Midnight Contrast"
+                    : "1980s Outrun Sunset & Neon UI",
+                false
+            );
+        }
+
+        public static void BuildPromoTile(
+            string sourcePath,
+            string outputPath,
+            int width,
+            int height,
+            bool isMarquee,
+            string badgeText,
+            string subtitleText,
+            string taglineText,
+            bool crtAccent)
         {
             const int ss = 2;
             int mw = width * ss;
@@ -802,18 +880,60 @@ namespace SynthwaveAssets
                 }
 
                 // Subtle CRT scanline sheen across full canvas
-                using (var scanPen = new Pen(Color.FromArgb(18, 0, 0, 0), 1.5f))
+                using (var scanPen = new Pen(Color.FromArgb(crtAccent ? 34 : 18, 0, 0, 0), crtAccent ? 2.0f : 1.5f))
                 {
-                    for (int sy = 12; sy < mh; sy += 6)
+                    int scanStep = crtAccent ? 5 : 6;
+                    for (int sy = 12; sy < mh; sy += scanStep)
                     {
                         g.DrawLine(scanPen, 0, sy, mw, sy);
+                    }
+                }
+
+                if (crtAccent)
+                {
+                    // Subtle full-width VHS tracking shimmer band fading smoothly out on the left behind typography
+                    float trackY = mh * 0.25f;
+                    float trackH = isMarquee ? 22f : 14f;
+                    using (var trackGrad = new LinearGradientBrush(
+                        new PointF(0, trackY),
+                        new PointF(mw, trackY),
+                        Color.FromArgb(0, 0, 240, 255),
+                        Color.FromArgb(30, 0, 240, 255)))
+                    {
+                        var hcb = new ColorBlend(4);
+                        hcb.Positions = new[] { 0.0f, 0.44f, 0.68f, 1.0f };
+                        hcb.Colors = new[] {
+                            Color.FromArgb(0, 0, 240, 255),
+                            Color.FromArgb(0, 0, 240, 255),
+                            Color.FromArgb(26, 0, 240, 255),
+                            Color.FromArgb(14, 255, 42, 133)
+                        };
+                        trackGrad.InterpolationColors = hcb;
+                        g.FillRectangle(trackGrad, 0, trackY + trackH * 0.35f, mw, trackH * 0.35f);
+                    }
+                    using (var trackSoft = new LinearGradientBrush(
+                        new PointF(0, trackY),
+                        new PointF(mw, trackY),
+                        Color.FromArgb(0, 0, 240, 255),
+                        Color.FromArgb(16, 0, 240, 255)))
+                    {
+                        var scb = new ColorBlend(4);
+                        scb.Positions = new[] { 0.0f, 0.44f, 0.68f, 1.0f };
+                        scb.Colors = new[] {
+                            Color.FromArgb(0, 0, 240, 255),
+                            Color.FromArgb(0, 0, 240, 255),
+                            Color.FromArgb(14, 0, 240, 255),
+                            Color.FromArgb(8, 181, 55, 242)
+                        };
+                        trackSoft.InterpolationColors = scb;
+                        g.FillRectangle(trackSoft, 0, trackY, mw, trackH);
                     }
                 }
 
                 float leftPad = isMarquee ? 150f : 48f;
                 float badgeY = isMarquee ? 210f : 94f;
                 float badgeH = isMarquee ? 60f : 40f;
-                float badgeW = isMarquee ? 360f : 220f;
+                float badgeW = isMarquee ? (crtAccent ? 410f : 360f) : (crtAccent ? 255f : 220f);
                 var badgeRect = new RectangleF(leftPad, badgeY, badgeW, badgeH);
 
                 // Eyebrow badge pill
@@ -831,22 +951,22 @@ namespace SynthwaveAssets
                 {
                     g.FillPath(badgeFill, badgePath);
                     g.DrawPath(badgePen, badgePath);
-                    g.DrawString("CHROME THEME", badgeFont, badgeTextBrush, badgeRect, sfCenter);
+                    g.DrawString(badgeText, badgeFont, badgeTextBrush, badgeRect, sfCenter);
                 }
 
                 // Main headline with subtle neon magenta/violet aura
                 float titleY = badgeY + badgeH + (isMarquee ? 34f : 20f);
                 string titleText = "NEON HORIZON";
                 using (var titleFont = new Font("Bahnschrift", isMarquee ? 132f : 60f, FontStyle.Bold, GraphicsUnit.Pixel))
-                using (var glowBrush = new SolidBrush(Color.FromArgb(85, 255, 42, 165)))
-                using (var cyanGlow = new SolidBrush(Color.FromArgb(65, 0, 240, 255)))
+                using (var glowBrush = new SolidBrush(Color.FromArgb(crtAccent ? 105 : 85, 255, 42, 165)))
+                using (var cyanGlow = new SolidBrush(Color.FromArgb(crtAccent ? 90 : 65, 0, 240, 255)))
                 using (var titleBrush = new LinearGradientBrush(
                     new PointF(0, titleY),
                     new PointF(0, titleY + (isMarquee ? 136f : 62f)),
                     Color.FromArgb(255, 255, 255),
                     Color.FromArgb(215, 232, 255)))
                 {
-                    float gOff = isMarquee ? 4f : 2.2f;
+                    float gOff = isMarquee ? (crtAccent ? 5.2f : 4f) : (crtAccent ? 2.8f : 2.2f);
                     g.DrawString(titleText, titleFont, cyanGlow, leftPad - gOff, titleY - gOff * 0.5f);
                     g.DrawString(titleText, titleFont, glowBrush, leftPad + gOff, titleY + gOff);
                     g.DrawString(titleText, titleFont, titleBrush, leftPad, titleY);
@@ -870,17 +990,14 @@ namespace SynthwaveAssets
                 using (var subFont = new Font("Bahnschrift", isMarquee ? 45f : 24f, FontStyle.Bold, GraphicsUnit.Pixel))
                 using (var subBrush = new SolidBrush(Color.FromArgb(246, 178, 255)))
                 {
-                    g.DrawString("SYNTHWAVE DARK THEME", subFont, subBrush, leftPad, subY);
+                    g.DrawString(subtitleText, subFont, subBrush, leftPad, subY);
                 }
 
                 float tagY = subY + (isMarquee ? 68f : 38f);
-                string tagText = isMarquee
-                    ? "1980s Outrun Sunset  •  Glowing Neon Tabs  •  Deep Midnight Contrast"
-                    : "1980s Outrun Sunset & Neon UI";
                 using (var tagFont = new Font("Segoe UI", isMarquee ? 30f : 19f, FontStyle.Regular, GraphicsUnit.Pixel))
                 using (var tagBrush = new SolidBrush(Color.FromArgb(222, 212, 248)))
                 {
-                    g.DrawString(tagText, tagFont, tagBrush, leftPad, tagY);
+                    g.DrawString(taglineText, tagFont, tagBrush, leftPad, tagY);
                 }
 
                 using (var finalBmp = new Bitmap(width, height, PixelFormat.Format24bppRgb))
@@ -941,96 +1058,134 @@ $cNeonViolet   = [SynthwaveAssets.RgbColor]::new(181, 55, 242)  # #B537F2
 $cNeonCyan     = [SynthwaveAssets.RgbColor]::new(0, 240, 255)   # #00F0FF
 $cDeepBlue     = [SynthwaveAssets.RgbColor]::new(67, 97, 238)   # #4361EE
 
-# 1. NTP Wallpaper (1920x1080 seamless PNG)
-[SynthwaveAssets.Generator]::BuildNtpWallpaper(
-    $sourceNtp,
-    (Join-Path $imgDir 'theme_ntp_background.png'),
-    1920, 1080, $cVoidBg, 1984
-)
-if (Test-Path (Join-Path $ChromeRoot 'extension\manifest.json')) {
-    $extAssetsDir = Join-Path $ChromeRoot 'extension\assets'
-    New-Item -ItemType Directory -Force -Path $extAssetsDir | Out-Null
-    Copy-Item -Path (Join-Path $imgDir 'theme_ntp_background.png') -Destination (Join-Path $extAssetsDir 'ntp_wallpaper.png') -Force
-}
+$genTheme = ($Target -eq 'All' -or $Target -eq 'Theme')
+$genExtension = ($Target -eq 'All' -or $Target -eq 'Extension')
 
-# 2. Browser Frame strips (2400x160)
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_frame.png'),
-    2400, 160, $cFrameTop, $cFrameMid, $cFrameBot, 0.35,
-    $cNeonPink, $cNeonViolet, $cNeonCyan, 0.72, 6, 0.0, 90, 0.55, 1985
-)
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_frame_inactive.png'),
-    2400, 160, $cInactTop, $cInactMid, $cInactBot, 0.38,
-    $cNeonViolet, $cDeepBlue, $cNeonPink, 0.28, 4, 0.0, 45, 0.28, 1986
-)
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_frame_incognito.png'),
-    2400, 160, $cIncogTop, $cIncogMid, $cIncogBot, 0.35,
-    $cNeonCyan, $cDeepBlue, $cNeonCyan, 0.65, 5, 0.0, 75, 0.45, 1987
-)
-
-# 3. Frame Corner Overlays (760x160 transparent RGBA)
-[SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay.png'), 760, 160, 1.0)
-[SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay_inactive.png'), 760, 160, 0.45)
-
-# 4. Active Tab + Toolbar strip (2400x140): synthwave tab body gradient + bright top rim transitioning cleanly into #1E1036 toolbar
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_toolbar.png'),
-    2400, 140, $cToolTop, $cToolMid, $cToolBot, 0.29,
-    $cNeonCyan, $cNeonViolet, $cNeonPink, 0.90, 9, 0.025, 0, 0.0, 1988,
-    40.0, 0.30, 3
-)
-
-# 5. Background Tab strips (2400x100): gradient capsule fill + highlighted top neon rim
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_tab_background.png'),
-    2400, 100, $cTabBgTop, $cTabBgMid, $cTabBgBot, 0.38,
-    $cNeonViolet, $cNeonPink, $cNeonCyan, 0.58, 7, 0.0, 0, 0.0, 1989,
-    36.0, 0.14, 3
-)
-[SynthwaveAssets.Generator]::BuildUiStrip(
-    (Join-Path $imgDir 'theme_tab_background_inactive.png'),
-    2400, 100, $cTabInactTop, $cTabInactMid, $cTabInactBot, 0.38,
-    $cDeepBlue, $cNeonViolet, $cDeepBlue, 0.30, 5, 0.0, 0, 0.0, 1990,
-    36.0, 0.08, 3
-)
-
-# 6. Window Control Caption Buttons soft gradient underlay (360x80 transparent RGBA)
-[SynthwaveAssets.Generator]::BuildWindowControlBackground(
-    (Join-Path $imgDir 'theme_window_control_background.png'),
-    360, 80, $cWinCtrlTop, $cWinCtrlLow,
-    $cNeonViolet, $cNeonPink, $cNeonCyan, 40.0, 1
-)
-
-# 7. Extension / Theme Icons (16, 48, 128)
-foreach ($iconSize in @(16, 48, 128)) {
-    [SynthwaveAssets.Generator]::BuildThemeIcon(
-        (Join-Path $imgDir "icon$iconSize.png"),
-        $iconSize
+if ($genTheme) {
+    # 1. NTP Wallpaper (1920x1080 seamless PNG)
+    [SynthwaveAssets.Generator]::BuildNtpWallpaper(
+        $sourceNtp,
+        (Join-Path $imgDir 'theme_ntp_background.png'),
+        1920, 1080, $cVoidBg, 1984
     )
+    if (Test-Path (Join-Path $ChromeRoot 'extension\manifest.json')) {
+        $extAssetsDir = Join-Path $ChromeRoot 'extension\assets'
+        New-Item -ItemType Directory -Force -Path $extAssetsDir | Out-Null
+        Copy-Item -Path (Join-Path $imgDir 'theme_ntp_background.png') -Destination (Join-Path $extAssetsDir 'ntp_wallpaper.png') -Force
+    }
+
+    # 2. Browser Frame strips (2400x160)
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_frame.png'),
+        2400, 160, $cFrameTop, $cFrameMid, $cFrameBot, 0.35,
+        $cNeonPink, $cNeonViolet, $cNeonCyan, 0.72, 6, 0.0, 90, 0.55, 1985
+    )
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_frame_inactive.png'),
+        2400, 160, $cInactTop, $cInactMid, $cInactBot, 0.38,
+        $cNeonViolet, $cDeepBlue, $cNeonPink, 0.28, 4, 0.0, 45, 0.28, 1986
+    )
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_frame_incognito.png'),
+        2400, 160, $cIncogTop, $cIncogMid, $cIncogBot, 0.35,
+        $cNeonCyan, $cDeepBlue, $cNeonCyan, 0.65, 5, 0.0, 75, 0.45, 1987
+    )
+
+    # 3. Frame Corner Overlays (760x160 transparent RGBA)
+    [SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay.png'), 760, 160, 1.0)
+    [SynthwaveAssets.Generator]::BuildFrameOverlay((Join-Path $imgDir 'theme_frame_overlay_inactive.png'), 760, 160, 0.45)
+
+    # 4. Active Tab + Toolbar strip (2400x140): synthwave tab body gradient + bright top rim transitioning cleanly into #1E1036 toolbar
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_toolbar.png'),
+        2400, 140, $cToolTop, $cToolMid, $cToolBot, 0.29,
+        $cNeonCyan, $cNeonViolet, $cNeonPink, 0.90, 9, 0.025, 0, 0.0, 1988,
+        40.0, 0.30, 3
+    )
+
+    # 5. Background Tab strips (2400x100): gradient capsule fill + highlighted top neon rim
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_tab_background.png'),
+        2400, 100, $cTabBgTop, $cTabBgMid, $cTabBgBot, 0.38,
+        $cNeonViolet, $cNeonPink, $cNeonCyan, 0.58, 7, 0.0, 0, 0.0, 1989,
+        36.0, 0.14, 3
+    )
+    [SynthwaveAssets.Generator]::BuildUiStrip(
+        (Join-Path $imgDir 'theme_tab_background_inactive.png'),
+        2400, 100, $cTabInactTop, $cTabInactMid, $cTabInactBot, 0.38,
+        $cDeepBlue, $cNeonViolet, $cDeepBlue, 0.30, 5, 0.0, 0, 0.0, 1990,
+        36.0, 0.08, 3
+    )
+
+    # 6. Window Control Caption Buttons soft gradient underlay (360x80 transparent RGBA)
+    [SynthwaveAssets.Generator]::BuildWindowControlBackground(
+        (Join-Path $imgDir 'theme_window_control_background.png'),
+        360, 80, $cWinCtrlTop, $cWinCtrlLow,
+        $cNeonViolet, $cNeonPink, $cNeonCyan, 40.0, 1
+    )
+
+    # 7. Extension / Theme Icons (16, 48, 128)
+    foreach ($iconSize in @(16, 48, 128)) {
+        [SynthwaveAssets.Generator]::BuildThemeIcon(
+            (Join-Path $imgDir "icon$iconSize.png"),
+            $iconSize
+        )
+    }
+
+    # 8. Chrome Web Store listing assets for Theme (128x128 padded icon + 24-bit opaque promo tiles)
+    $storeDir = Join-Path $ChromeRoot 'store'
+    New-Item -ItemType Directory -Force -Path $storeDir | Out-Null
+
+    # CWS Store Icon: 96x96 artwork with 16px transparent margin on all sides (64px at 512px master)
+    [SynthwaveAssets.Generator]::BuildThemeIcon(
+        (Join-Path $storeDir 'store-icon-128.png'),
+        128, 64.0
+    )
+
+    # Small Promo Tile (440x280) & Marquee Promo Tile (1400x560)
+    [SynthwaveAssets.Generator]::BuildPromoTile(
+        $sourceNtp,
+        (Join-Path $storeDir 'promo-small-440x280.png'),
+        440, 280, $false
+    )
+    [SynthwaveAssets.Generator]::BuildPromoTile(
+        $sourceNtp,
+        (Join-Path $storeDir 'promo-marquee-1400x560.png'),
+        1400, 560, $true
+    )
+
+    Write-Host "Successfully generated 13 theme PNG assets in $imgDir and 3 store PNG assets in $storeDir"
 }
 
-# 8. Chrome Web Store listing assets (128x128 padded icon + 24-bit opaque promo tiles)
-$storeDir = Join-Path $ChromeRoot 'store'
-New-Item -ItemType Directory -Force -Path $storeDir | Out-Null
+if ($genExtension) {
+    $extStoreDir = Join-Path $ChromeRoot 'store\extension'
+    New-Item -ItemType Directory -Force -Path $extStoreDir | Out-Null
 
-# CWS Store Icon: 96x96 artwork with 16px transparent margin on all sides (64px at 512px master)
-[SynthwaveAssets.Generator]::BuildThemeIcon(
-    (Join-Path $storeDir 'store-icon-128.png'),
-    128, 64.0
-)
+    # CWS Extension Store Icon: 96x96 CRT/VHS artwork with 16px transparent padding (64px at 512px master)
+    [SynthwaveAssets.Generator]::BuildThemeIcon(
+        (Join-Path $extStoreDir 'store-icon-128.png'),
+        128, 64.0, $true
+    )
 
-# Small Promo Tile (440x280) & Marquee Promo Tile (1400x560)
-[SynthwaveAssets.Generator]::BuildPromoTile(
-    $sourceNtp,
-    (Join-Path $storeDir 'promo-small-440x280.png'),
-    440, 280, $false
-)
-[SynthwaveAssets.Generator]::BuildPromoTile(
-    $sourceNtp,
-    (Join-Path $storeDir 'promo-marquee-1400x560.png'),
-    1400, 560, $true
-)
+    # Extension Small Promo Tile (440x280) & Marquee/Large Promo Tile (1400x560)
+    [SynthwaveAssets.Generator]::BuildPromoTile(
+        $sourceNtp,
+        (Join-Path $extStoreDir 'promo-small-440x280.png'),
+        440, 280, $false,
+        'CHROME EXTENSION',
+        'CRT & VHS SHADER',
+        'WebGL2 New Tab & CRT/VHS Overlay',
+        $true
+    )
+    [SynthwaveAssets.Generator]::BuildPromoTile(
+        $sourceNtp,
+        (Join-Path $extStoreDir 'promo-marquee-1400x560.png'),
+        1400, 560, $true,
+        'CHROME EXTENSION',
+        'CRT & VHS SHADER',
+        "Animated WebGL2 New Tab  •  CRT Screen Curvature  •  VHS & Bloom",
+        $true
+    )
 
-Write-Host "Successfully generated 13 theme PNG assets in $imgDir and 3 store PNG assets in $storeDir"
+    Write-Host "Successfully generated 3 extension store PNG assets in $extStoreDir"
+}

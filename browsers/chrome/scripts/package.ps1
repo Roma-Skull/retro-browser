@@ -248,6 +248,7 @@ if ($buildExtension) {
             throw "Expected extension manifest_version 3, got $($extManifest.manifest_version)"
         }
         $extRequired = @(
+            'manifest.json',
             'background.js',
             'content.js',
             'popup.html',
@@ -268,29 +269,78 @@ if ($buildExtension) {
                 throw "Missing extension file: $rel"
             }
         }
-        Write-Host "Validated companion CRT/VHS shader extension ($($extRequired.Count) core files)."
+        Write-Host "Validated companion CRT/VHS shader extension ($($extRequired.Count) files)."
 
-        if ($CreateZip) {
+        if ($CreateZip -or $Release) {
             if (-not (Test-Path $distDir)) {
                 New-Item -ItemType Directory -Force -Path $distDir | Out-Null
             }
-            $extZipPath = Join-Path $distDir 'neon-horizon-crt-vhs-shader.zip'
-            if (Test-Path $extZipPath) { Remove-Item $extZipPath -Force }
-            Compress-Archive -Path @(
-                (Join-Path $extDir 'manifest.json'),
-                (Join-Path $extDir 'background.js'),
-                (Join-Path $extDir 'content.js'),
-                (Join-Path $extDir 'popup.html'),
-                (Join-Path $extDir 'popup.css'),
-                (Join-Path $extDir 'popup.js'),
-                (Join-Path $extDir 'newtab.html'),
-                (Join-Path $extDir 'newtab.css'),
-                (Join-Path $extDir 'newtab.js'),
-                (Join-Path $extDir 'shared'),
-                (Join-Path $extDir 'assets'),
-                (Join-Path $extDir 'icons')
-            ) -DestinationPath $extZipPath -CompressionLevel Optimal
-            Write-Host "Packaged extension ZIP archive: $extZipPath"
+
+            $stageBase = Join-Path ([System.IO.Path]::GetTempPath()) ("nh-ext-stage-" + [Guid]::NewGuid().ToString('N'))
+            $stageDir  = Join-Path $stageBase 'extension'
+            New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
+
+            try {
+                foreach ($rel in $extRequired) {
+                    $srcFile = Join-Path $extDir $rel
+                    $dstFile = Join-Path $stageDir $rel
+                    $dstParent = Split-Path -Parent $dstFile
+                    if (-not (Test-Path $dstParent)) {
+                        New-Item -ItemType Directory -Force -Path $dstParent | Out-Null
+                    }
+                    Copy-Item -Path $srcFile -Destination $dstFile -Force
+                }
+
+                if ($CreateZip) {
+                    $extZipPath = Join-Path $distDir 'neon-horizon-crt-vhs-shader.zip'
+                    if (Test-Path $extZipPath) { Remove-Item $extZipPath -Force }
+                    Push-Location $stageDir
+                    try {
+                        Compress-Archive -Path @('*') -DestinationPath $extZipPath -CompressionLevel Optimal
+                    } finally {
+                        Pop-Location
+                    }
+                    Write-Host "Packaged extension ZIP archive: $extZipPath"
+                }
+
+                if ($Release) {
+                    $extVersion = [string]$extManifest.version
+                    $relDir     = Join-Path $distDir "releases\extension-v$extVersion"
+                    if (Test-Path $relDir) { Remove-Item $relDir -Recurse -Force }
+                    New-Item -ItemType Directory -Force -Path $relDir | Out-Null
+
+                    $relZipName = "neon-horizon-crt-vhs-shader-v$extVersion.zip"
+                    $relCrxName = "neon-horizon-crt-vhs-shader-v$extVersion.crx"
+                    $relZipPath = Join-Path $relDir $relZipName
+                    $relCrxPath = Join-Path $relDir $relCrxName
+                    $pemKeyPath = Join-Path $distDir 'keys\neon-horizon-crt-vhs-shader.pem'
+
+                    Push-Location $stageDir
+                    try {
+                        Compress-Archive -Path @('*') -DestinationPath $relZipPath -CompressionLevel Optimal
+                    } finally {
+                        Pop-Location
+                    }
+
+                    Build-CrxPackage -StageDir $stageDir -CrxOutPath $relCrxPath -PemKeyPath $pemKeyPath
+
+                    $sumLines = @(
+                        "$((Get-FileHash -Algorithm SHA256 $relZipPath).Hash.ToLowerInvariant())  $relZipName",
+                        "$((Get-FileHash -Algorithm SHA256 $relCrxPath).Hash.ToLowerInvariant())  $relCrxName"
+                    )
+                    $sumPath = Join-Path $relDir 'SHA256SUMS.txt'
+                    [System.IO.File]::WriteAllLines($sumPath, $sumLines, (New-Object System.Text.UTF8Encoding($false)))
+
+                    Write-Host "Extension v$extVersion release ready in: $relDir"
+                    Write-Host "  ZIP: $relZipPath"
+                    Write-Host "  CRX: $relCrxPath"
+                    Write-Host "  PEM key (private, keep safe outside release): $pemKeyPath"
+                }
+            } finally {
+                if (Test-Path $stageBase) {
+                    Remove-Item -LiteralPath $stageBase -Recurse -Force -ErrorAction SilentlyContinue
+                }
+            }
         }
     }
 }

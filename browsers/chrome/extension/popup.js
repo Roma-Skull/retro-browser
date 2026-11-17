@@ -43,7 +43,7 @@
     siteRow.hidden = isNewTabScope;
     newTabSyncRow.hidden = !isNewTabScope;
     newTabAnimBgRow.hidden = !isNewTabScope;
-    curvatureLabel.textContent = isNewTabScope ? 'Изгиб экрана (WebGL2)' : 'Изгиб экрана (CRT)';
+    curvatureLabel.textContent = isNewTabScope ? 'Screen curvature (WebGL2)' : 'Screen curvature (CRT)';
 
     const profile = profileCtrl ? profileCtrl.render() : state;
     document.body.classList.toggle('is-disabled', !profile.enabled);
@@ -56,19 +56,19 @@
       toggleSiteBtn.disabled = true;
       toggleSiteBtn.classList.remove('is-excluded');
       if (activeIsExtensionNewTab) {
-        siteLabel.textContent = 'Настройки сайтов (откройте вкладку с сайтом)';
+        siteLabel.textContent = 'Website settings (open a webpage tab)';
       } else if (activeProtocol === 'file:') {
-        siteLabel.textContent = 'Локальный файл (file://)';
+        siteLabel.textContent = 'Local file (file://)';
       } else {
-        siteLabel.textContent = 'Служебная страница Chrome (сайт не выбран)';
+        siteLabel.textContent = 'Chrome internal page (no website active)';
       }
     } else {
       const excluded = state.disabledHosts.includes(activeHostname);
       toggleSiteBtn.disabled = false;
       toggleSiteBtn.classList.toggle('is-excluded', excluded);
       siteLabel.textContent = excluded
-        ? `Включить для ${activeHostname}`
-        : `Отключить для ${activeHostname}`;
+        ? `Enable for ${activeHostname}`
+        : `Disable for ${activeHostname}`;
     }
   }
 
@@ -174,6 +174,7 @@
         scanlines: state.scanlines,
         bloom: state.bloom,
         vhs: state.vhs,
+        sweep: state.sweep,
         vignette: state.vignette,
         animate: state.animate,
         syncWithSites: false

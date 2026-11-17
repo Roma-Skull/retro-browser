@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const SLIDER_KEYS = Object.freeze(['curvature', 'scanlines', 'bloom', 'vhs', 'vignette']);
+  const SLIDER_KEYS = Object.freeze(['curvature', 'scanlines', 'bloom', 'vhs', 'sweep', 'vignette']);
 
   const DEFAULT_QUICK_LINKS = Object.freeze([
     { title: 'Google', url: 'https://www.google.com' },
@@ -12,26 +12,29 @@
 
   const PRESETS = Object.freeze({
     soft: Object.freeze({
-      curvature: 25,
+      curvature: 14,
       scanlines: 28,
       bloom: 32,
       vhs: 22,
+      sweep: 35,
       vignette: 35,
       animate: true
     }),
     outrun: Object.freeze({
-      curvature: 48,
+      curvature: 24,
       scanlines: 45,
       bloom: 58,
       vhs: 38,
+      sweep: 55,
       vignette: 55,
       animate: true
     }),
     vhs: Object.freeze({
-      curvature: 20,
+      curvature: 40,
       scanlines: 52,
       bloom: 36,
       vhs: 75,
+      sweep: 60,
       vignette: 48,
       animate: true
     }),
@@ -40,6 +43,7 @@
       scanlines: 18,
       bloom: 22,
       vhs: 8,
+      sweep: 0,
       vignette: 18,
       animate: false
     })
@@ -49,24 +53,26 @@
     enabled: true,
     syncWithSites: false,
     animateBg: true,
-    preset: 'outrun',
-    curvature: PRESETS.outrun.curvature,
-    scanlines: PRESETS.outrun.scanlines,
-    bloom: PRESETS.outrun.bloom,
-    vhs: PRESETS.outrun.vhs,
-    vignette: PRESETS.outrun.vignette,
-    animate: PRESETS.outrun.animate
+    preset: 'vhs',
+    curvature: PRESETS.vhs.curvature,
+    scanlines: PRESETS.vhs.scanlines,
+    bloom: PRESETS.vhs.bloom,
+    vhs: PRESETS.vhs.vhs,
+    sweep: PRESETS.vhs.sweep,
+    vignette: PRESETS.vhs.vignette,
+    animate: PRESETS.vhs.animate
   });
 
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
-    preset: 'soft',
-    curvature: 25,
-    scanlines: 28,
-    bloom: 32,
-    vhs: 22,
-    vignette: 35,
-    animate: true,
+    preset: 'vhs',
+    curvature: PRESETS.vhs.curvature,
+    scanlines: PRESETS.vhs.scanlines,
+    bloom: PRESETS.vhs.bloom,
+    vhs: PRESETS.vhs.vhs,
+    sweep: PRESETS.vhs.sweep,
+    vignette: PRESETS.vhs.vignette,
+    animate: PRESETS.vhs.animate,
     disabledHosts: [],
     newTab: DEFAULT_NEWTAB_SETTINGS
   });
@@ -86,6 +92,7 @@
       scanlines: clampPercent(src.scanlines, defaults.scanlines),
       bloom: clampPercent(src.bloom, defaults.bloom),
       vhs: clampPercent(src.vhs, defaults.vhs),
+      sweep: clampPercent(src.sweep, defaults.sweep),
       vignette: clampPercent(src.vignette, defaults.vignette),
       animate: typeof src.animate === 'boolean' ? src.animate : defaults.animate
     };
@@ -126,6 +133,7 @@
       scanlines: normalized.scanlines,
       bloom: normalized.bloom,
       vhs: normalized.vhs,
+      sweep: normalized.sweep,
       vignette: normalized.vignette,
       animate: normalized.animate
     };

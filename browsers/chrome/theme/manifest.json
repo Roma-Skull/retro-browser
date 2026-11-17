@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Neon Horizon — Synthwave",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "1980s Synthwave / Outrun dark theme featuring a glowing retro horizon, neon cyan & magenta highlights, and high-contrast typography.",
   "icons": {
     "16": "images/icon16.png",

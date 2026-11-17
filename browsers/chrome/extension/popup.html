@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,7 @@
           <div class="subtitle">CRT &amp; VHS Shader</div>
         </div>
       </div>
-      <label class="power-switch" title="Включить или выключить шейдер (Alt+Shift+V)">
+      <label class="power-switch" title="Toggle shader on/off (Alt+Shift+V)">
         <input type="checkbox" id="toggle-enabled" data-role="toggle-enabled" />
         <span class="power-track">
           <span class="power-thumb"></span>
@@ -24,34 +24,34 @@
       </label>
     </header>
 
-    <div class="scope-tabs" role="tablist" aria-label="Профиль настроек">
-      <button id="scope-sites" class="scope-tab active" data-scope="sites" type="button" role="tab" aria-selected="true">На сайтах</button>
-      <button id="scope-newtab" class="scope-tab" data-scope="newtab" type="button" role="tab" aria-selected="false">Новая вкладка</button>
+    <div class="scope-tabs" role="tablist" aria-label="Settings profile">
+      <button id="scope-sites" class="scope-tab active" data-scope="sites" type="button" role="tab" aria-selected="true">Websites</button>
+      <button id="scope-newtab" class="scope-tab" data-scope="newtab" type="button" role="tab" aria-selected="false">New Tab</button>
     </div>
 
     <div class="site-row" id="site-row">
       <button id="toggle-site" class="site-btn" type="button">
         <span class="site-dot"></span>
-        <span id="site-label">Проверка вкладки...</span>
+        <span id="site-label">Checking tab...</span>
       </button>
     </div>
 
     <div class="sync-row" id="newtab-sync-row" hidden>
-      <label class="sync-check" title="Использовать на новой вкладке те же настройки, что и для сайтов">
+      <label class="sync-check" title="Use the same settings on New Tab as on websites">
         <input type="checkbox" id="popup-sync-sites" />
-        <span>Синхр. с сайтами</span>
+        <span>Sync with sites</span>
       </label>
-      <button type="button" id="popup-copy-sites" class="copy-btn" title="Скопировать настройки с сайтов">Копия</button>
+      <button type="button" id="popup-copy-sites" class="copy-btn" title="Copy settings from websites">Copy</button>
     </div>
 
     <div class="bg-anim-row" id="newtab-animbg-row" hidden>
-      <label class="sync-check" title="Движение неоновой сетки, мерцание звёзд и пульсация солнца">
+      <label class="sync-check" title="Animate neon grid flight, twinkling stars, and pulsing sun">
         <input type="checkbox" id="popup-animate-bg" />
-        <span>Живой фон (полёт над сеткой)</span>
+        <span>Live background (grid flight)</span>
       </label>
     </div>
 
-    <section class="presets" aria-label="Пресеты">
+    <section class="presets" aria-label="Presets">
       <button class="preset-btn" data-preset="soft" type="button">Soft CRT</button>
       <button class="preset-btn" data-preset="outrun" type="button">Outrun 84</button>
       <button class="preset-btn" data-preset="vhs" type="button">VHS Tape</button>
@@ -61,54 +61,62 @@
     <section class="sliders">
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-curvature" id="label-curvature">Изгиб экрана (CRT)</label>
-          <span class="val" id="val-curvature" data-val="curvature">25%</span>
+          <label for="slider-curvature" id="label-curvature">Screen curvature (CRT)</label>
+          <span class="val" id="val-curvature" data-val="curvature">40%</span>
         </div>
-        <input type="range" id="slider-curvature" data-slider="curvature" min="0" max="100" value="25" />
+        <input type="range" id="slider-curvature" data-slider="curvature" min="0" max="100" value="40" />
       </div>
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-scanlines">Чересстрочный сканлайн</label>
-          <span class="val" id="val-scanlines" data-val="scanlines">28%</span>
+          <label for="slider-scanlines">Interlaced scanlines</label>
+          <span class="val" id="val-scanlines" data-val="scanlines">52%</span>
         </div>
-        <input type="range" id="slider-scanlines" data-slider="scanlines" min="0" max="100" value="28" />
+        <input type="range" id="slider-scanlines" data-slider="scanlines" min="0" max="100" value="52" />
       </div>
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-bloom">Свечение ЭЛТ (Bloom)</label>
-          <span class="val" id="val-bloom" data-val="bloom">32%</span>
+          <label for="slider-bloom">Phosphor bloom glow</label>
+          <span class="val" id="val-bloom" data-val="bloom">36%</span>
         </div>
-        <input type="range" id="slider-bloom" data-slider="bloom" min="0" max="100" value="32" />
+        <input type="range" id="slider-bloom" data-slider="bloom" min="0" max="100" value="36" />
       </div>
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-vhs">VHS-лента и хроматика</label>
-          <span class="val" id="val-vhs" data-val="vhs">22%</span>
+          <label for="slider-vhs">VHS tape &amp; chromaticity</label>
+          <span class="val" id="val-vhs" data-val="vhs">75%</span>
         </div>
-        <input type="range" id="slider-vhs" data-slider="vhs" min="0" max="100" value="22" />
+        <input type="range" id="slider-vhs" data-slider="vhs" min="0" max="100" value="75" />
       </div>
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-vignette">Стекло и виньетка</label>
-          <span class="val" id="val-vignette" data-val="vignette">35%</span>
+          <label for="slider-sweep">Scan sweep bar</label>
+          <span class="val" id="val-sweep" data-val="sweep">60%</span>
         </div>
-        <input type="range" id="slider-vignette" data-slider="vignette" min="0" max="100" value="35" />
+        <input type="range" id="slider-sweep" data-slider="sweep" min="0" max="100" value="60" />
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <label for="slider-vignette">Glass &amp; vignette</label>
+          <span class="val" id="val-vignette" data-val="vignette">48%</span>
+        </div>
+        <input type="range" id="slider-vignette" data-slider="vignette" min="0" max="100" value="48" />
       </div>
     </section>
 
     <footer class="footer">
       <label class="anim-toggle">
         <input type="checkbox" id="toggle-animate" data-role="toggle-animate" />
-        <span>Анимация развёртки</span>
+        <span>Scan animation</span>
       </label>
-      <button id="btn-reset" data-role="reset-btn" class="reset-btn" type="button">Сброс</button>
+      <button id="btn-reset" data-role="reset-btn" class="reset-btn" type="button">Reset</button>
     </footer>
 
-    <div class="hotkey-hint">Быстрое переключение: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></div>
+    <div class="hotkey-hint">Quick toggle: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></div>
   </div>
 
   <script src="shared/defaults.js"></script>
