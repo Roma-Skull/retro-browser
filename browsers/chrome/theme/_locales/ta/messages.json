@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "ஒளிரும் ரெட்ரோ அடிவானம், நியான் சியான் & மெஜந்தா நிறங்களுடன் 1980களின் Synthwave / Outrun டார்க் தீம்.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

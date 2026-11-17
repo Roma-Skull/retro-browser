@@ -15,6 +15,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 
 if ([string]::IsNullOrWhiteSpace($ChromeRoot)) {
     $ChromeRoot = Split-Path -Parent $PSScriptRoot
@@ -160,16 +161,71 @@ if ($buildTheme) {
         }
     }
 
+    $localesDir    = Join-Path $themeDir '_locales'
+    $hasLocalesDir = Test-Path $localesDir -PathType Container
+    $hasDefaultLoc = ($manifest.PSObject.Properties.Name -contains 'default_locale') -and -not [string]::IsNullOrWhiteSpace([string]$manifest.default_locale)
+
+    if ($hasLocalesDir -and -not $hasDefaultLoc) {
+        throw 'Theme has _locales directory but manifest.json is missing "default_locale".'
+    }
+    if ($hasDefaultLoc -and -not $hasLocalesDir) {
+        throw "Theme manifest declares default_locale '$($manifest.default_locale)' but _locales directory is missing."
+    }
+
+    $localeCount = 0
+    if ($hasLocalesDir) {
+        $defaultMessages = Join-Path $localesDir "$($manifest.default_locale)\messages.json"
+        if (-not (Test-Path $defaultMessages -PathType Leaf)) {
+            throw "Missing default_locale messages file: $defaultMessages"
+        }
+
+        $msgKeys = @()
+        foreach ($fieldVal in @([string]$manifest.name, [string]$manifest.description)) {
+            if ($fieldVal -match '^__MSG_([A-Za-z0-9_@]+)__$') {
+                $msgKeys += $Matches[1]
+            }
+        }
+
+        $localeDirs = @(Get-ChildItem -Path $localesDir -Directory)
+        if ($localeDirs.Count -eq 0) {
+            throw '_locales directory contains no locale subdirectories.'
+        }
+
+        foreach ($locDir in $localeDirs) {
+            $msgPath = Join-Path $locDir.FullName 'messages.json'
+            if (-not (Test-Path $msgPath -PathType Leaf)) {
+                throw "Missing messages.json in locale '$($locDir.Name)'."
+            }
+            $msgs = Get-Content -Raw -Encoding UTF8 $msgPath | ConvertFrom-Json
+            foreach ($key in $msgKeys) {
+                if (-not ($msgs.PSObject.Properties.Name -contains $key)) {
+                    throw "Locale '$($locDir.Name)' is missing manifest message key '$key'."
+                }
+                $val = [string]$msgs.$key.message
+                if ([string]::IsNullOrWhiteSpace($val)) {
+                    throw "Locale '$($locDir.Name)' has empty message for '$key'."
+                }
+                if ($key -eq 'themeName' -and $val.Length -gt 75) {
+                    throw "Locale '$($locDir.Name)' themeName exceeds 75 characters ($($val.Length))."
+                }
+                if ($key -eq 'themeDescription' -and $val.Length -gt 132) {
+                    throw "Locale '$($locDir.Name)' themeDescription exceeds 132 characters ($($val.Length))."
+                }
+            }
+            $localeCount++
+        }
+    }
+
     $colorCount = @($manifest.theme.colors.PSObject.Properties).Count
     $tintCount  = @($manifest.theme.tints.PSObject.Properties).Count
-    Write-Host "Validated $($imagePaths.Count) PNG assets, $colorCount colors, and $tintCount tints."
+    Write-Host "Validated $($imagePaths.Count) PNG assets, $colorCount colors, $tintCount tints, and $localeCount locales."
 
     if ($CreateZip -or $Release) {
         if (-not (Test-Path $distDir)) {
             New-Item -ItemType Directory -Force -Path $distDir | Out-Null
         }
 
-        # Stage only declared manifest + PNGs (never Cached Theme.pak or extraneous files)
+        # Stage only declared manifest + PNGs + _locales (never Cached Theme.pak or extraneous files)
         $stageBase = Join-Path ([System.IO.Path]::GetTempPath()) ("nh-theme-stage-" + [Guid]::NewGuid().ToString('N'))
         $stageDir  = Join-Path $stageBase 'theme'
         New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
@@ -186,12 +242,23 @@ if ($buildTheme) {
                 Copy-Item -Path $srcImg -Destination $dstImg -Force
             }
 
+            $archiveItems = @('manifest.json', 'images')
+            if ($hasLocalesDir) {
+                $dstLocales = Join-Path $stageDir '_locales'
+                foreach ($locDir in (Get-ChildItem -Path $localesDir -Directory)) {
+                    $dstLocDir = Join-Path $dstLocales $locDir.Name
+                    New-Item -ItemType Directory -Force -Path $dstLocDir | Out-Null
+                    Copy-Item -Path (Join-Path $locDir.FullName 'messages.json') -Destination (Join-Path $dstLocDir 'messages.json') -Force
+                }
+                $archiveItems += '_locales'
+            }
+
             if ($CreateZip) {
                 $zipPath = Join-Path $distDir 'neon-horizon-synthwave-theme.zip'
                 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
                 Push-Location $stageDir
                 try {
-                    Compress-Archive -Path @('manifest.json', 'images') -DestinationPath $zipPath -CompressionLevel Optimal
+                    Compress-Archive -Path $archiveItems -DestinationPath $zipPath -CompressionLevel Optimal
                 } finally {
                     Pop-Location
                 }
@@ -212,7 +279,7 @@ if ($buildTheme) {
 
                 Push-Location $stageDir
                 try {
-                    Compress-Archive -Path @('manifest.json', 'images') -DestinationPath $relZipPath -CompressionLevel Optimal
+                    Compress-Archive -Path $archiveItems -DestinationPath $relZipPath -CompressionLevel Optimal
                 } finally {
                     Pop-Location
                 }

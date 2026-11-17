@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "Tumša 80. gadu Synthwave / Outrun tēma ar mirdzošu retro horizontu, neona ciāna un fuksīna akcentiem un skaidru tekstu.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

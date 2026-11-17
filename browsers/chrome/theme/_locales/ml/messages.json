@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "തിളങ്ങുന്ന റെട്രോ ചക്രവാളവും നിയോൺ സിയാൻ, മജന്ത ഹൈലൈറ്റുകളുമുള്ള 1980-കളിലെ Synthwave / Outrun ഡാർക്ക് തീം.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "१९८० च्या दशकातील Synthwave / Outrun डार्क थीम — चमकणारे रेट्रो क्षितिज, निऑन सियान आणि मॅजेंटा हायलाइट्ससह.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

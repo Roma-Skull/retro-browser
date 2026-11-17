@@ -1,7 +1,7 @@
-# Chrome Web Store Listing — Neon Horizon — Synthwave (Theme v1.0.2)
+# Chrome Web Store Listing — Neon Horizon — Synthwave (Theme v1.0.4)
 
 ## Upload Package
-- **File to upload:** `dist/chrome/releases/theme-v1.0.2/neon-horizon-synthwave-theme-v1.0.2.zip`
+- **File to upload:** `dist/chrome/releases/theme-v1.0.4/neon-horizon-synthwave-theme-v1.0.4.zip`
 
 ## Store Icon & Promotional Graphics (`browsers/chrome/store/`)
 - **Store icon (`128x128` PNG, `96x96` visual + `16px` transparent padding):** `store-icon-128.png`

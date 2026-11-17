@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "Mandhari meusi ya Synthwave / Outrun ya miaka ya 80 yenye upeo wa retro unaong'aa, rangi za neon na maandishi ya wazi.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

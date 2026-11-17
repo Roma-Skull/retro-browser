@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "የ1980ዎቹ Synthwave / Outrun ጨለማ ገጽታ፤ የሚያበራ ሬትሮ አድማስ፣ የኒዮን ሰማያዊና ማጀንታ ድምቀቶች እና ግልጽ ጽሑፍ ያለው።",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

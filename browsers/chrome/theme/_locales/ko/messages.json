@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "빛나는 레트로 지평선, 네온 시안 & 마젠타 포인트, 높은 대비의 텍스트를 갖춘 1980년대 Synthwave / Outrun 다크 테마.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "మెరిసే రెట్రో హోరిజోన్, నియాన్ సియాన్ & మెజెంటా హైలైట్‌లతో 1980ల Synthwave / Outrun డార్క్ థీమ్.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

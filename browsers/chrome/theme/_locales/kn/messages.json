@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "1980ರ Synthwave / Outrun ಡಾರ್ಕ್ ಥೀಮ್ — ಹೊಳೆಯುವ ರೆಟ್ರೋ ದಿಗಂತ, ನಿಯಾನ್ ಸಯಾನ್ ಮತ್ತು ಮೆಜೆಂಟಾ ಹೈಲೈಟ್‌ಗಳೊಂದಿಗೆ.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

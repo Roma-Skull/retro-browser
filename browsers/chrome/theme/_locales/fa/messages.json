@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "تم تیره Synthwave / Outrun دهه ۸۰ با افق رترو درخشان، هایلایت‌های نئون فیروزه‌ای و سرخابی و کنتراست بالا.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

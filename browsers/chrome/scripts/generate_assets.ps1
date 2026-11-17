@@ -34,6 +34,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace SynthwaveAssets
 {
@@ -71,7 +72,7 @@ namespace SynthwaveAssets
 
         private static double SmoothStep(double edge0, double edge1, double x)
         {
-            if (edge1 <= edge0) return x >= edge1 ? 1.0 : 0.0;
+            if (Math.Abs(edge1 - edge0) < 1e-12) return x >= edge1 ? 1.0 : 0.0;
             double t = Math.Max(0.0, Math.Min(1.0, (x - edge0) / (edge1 - edge0)));
             return t * t * (3.0 - 2.0 * t);
         }
@@ -350,58 +351,87 @@ namespace SynthwaveAssets
             }
         }
 
+        private static double Frac(double x) { return x - Math.Floor(x); }
+
+        private static double Hash11(double p)
+        {
+            p = Frac(p * 0.1031);
+            p *= p + 33.33;
+            p *= p + p;
+            return Frac(p);
+        }
+
+        private static double SdSegment(double px, double py, double ax, double ay, double bx, double by)
+        {
+            double pax = px - ax, pay = py - ay;
+            double bax = bx - ax, bay = by - ay;
+            double denom = Math.Max(1e-6, bax * bax + bay * bay);
+            double h = Math.Max(0.0, Math.Min(1.0, (pax * bax + pay * bay) / denom));
+            double dx = pax - bax * h, dy = pay - bay * h;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+
+        private static double MtnHeight(double idx, double side)
+        {
+            double x = Math.Abs(idx) * 0.105;
+            double envelope = SmoothStep(0.20, 0.55, x) * (0.55 + 0.45 * Hash11(idx * 3.17 + side * 19.7));
+            return (0.042 + 0.088 * Hash11(idx * 7.41 + side * 11.3)) * envelope;
+        }
+
+        private static double MtnPeakOffset(double idx, double side)
+        {
+            return (Hash11(idx * 5.23 + side * 31.1) - 0.5) * 0.042;
+        }
+
         public static void BuildNtpWallpaper(
-            string sourcePath,
             string outputPath,
             int targetWidth,
             int targetHeight,
+            double horFromBottom,
+            double refHeight,
             RgbColor ntpBaseColor,
             int seed)
         {
-            using (var src = new Bitmap(sourcePath))
-            using (var scaled = new Bitmap(targetWidth, targetHeight, PixelFormat.Format24bppRgb))
+            using (var bmp = new Bitmap(targetWidth, targetHeight, PixelFormat.Format24bppRgb))
             {
-                using (var g = Graphics.FromImage(scaled))
-                {
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-                    g.DrawImage(src, new Rectangle(0, 0, targetWidth, targetHeight));
-                }
-
                 var rect = new Rectangle(0, 0, targetWidth, targetHeight);
-                var data = scaled.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                var data = bmp.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                 int stride = data.Stride;
                 byte[] buf = new byte[stride * targetHeight];
-                Marshal.Copy(data.Scan0, buf, 0, buf.Length);
 
-                // Seeded crisp 1:1 native stars in the upper calm sky (avoiding the sun region)
+                double horY = targetHeight - horFromBottom;
+                double pxScale = 1.0 / refHeight;
+                double sunCenterY = 0.062;
+                double sunR = 0.188;
+
+                // Seeded crisp 1:1 native stars distributed across the full sky canvas
                 var rng = new Random(seed);
                 double[] starMask = new double[targetWidth * targetHeight];
                 int[] starKind = new int[targetWidth * targetHeight];
-                double sunCx = targetWidth * 0.50;
-                double sunCy = targetHeight * 0.51;
-                double sunAvoidR = targetHeight * 0.25;
+                double sunCxPx = targetWidth * 0.5;
+                double sunCyPx = horY - sunCenterY * refHeight;
+                double sunAvoidRPx = sunR * refHeight * 1.25;
+                int starCount = Math.Max(180, (targetWidth * targetHeight) / 14000);
+                int maxStarY = Math.Max(40, (int)horY - 12);
 
-                for (int i = 0; i < 160; i++)
+                for (int i = 0; i < starCount; i++)
                 {
-                    int sx = rng.Next(40, targetWidth - 40);
-                    int sy = rng.Next(45, (int)(targetHeight * 0.44));
-                    double dx = sx - sunCx;
-                    double dy = sy - sunCy;
-                    if (dx * dx + dy * dy < sunAvoidR * sunAvoidR) continue;
+                    int sx = rng.Next(4, targetWidth - 4);
+                    int sy = rng.Next(12, maxStarY);
+                    double dx = sx - sunCxPx;
+                    double dy = sy - sunCyPx;
+                    if (dx * dx + dy * dy < sunAvoidRPx * sunAvoidRPx) continue;
 
-                    double topFade = SmoothStep(35.0, 140.0, sy);
-                    double bright = (0.20 + rng.NextDouble() * 0.65) * topFade;
+                    double topFade = SmoothStep(8.0, 90.0, sy);
+                    double horFade = SmoothStep(12.0, 120.0, horY - sy);
+                    double bright = (0.22 + rng.NextDouble() * 0.72) * topFade * horFade;
                     int kind = rng.Next(4);
-                    starMask[sy * targetWidth + sx] = bright;
+                    starMask[sy * targetWidth + sx] = Math.Max(starMask[sy * targetWidth + sx], bright);
                     starKind[sy * targetWidth + sx] = kind;
 
-                    // Occasional subtle 4-point glint on brighter stars
-                    if (bright > 0.62 && sx > 1 && sx < targetWidth - 2 && sy > 1 && sy < targetHeight - 2)
+                    if (bright > 0.58 && sx > 2 && sx < targetWidth - 3 && sy > 2 && sy < targetHeight - 3)
                     {
-                        double arm = bright * 0.35;
+                        double arm = bright * 0.36;
                         starMask[sy * targetWidth + (sx - 1)] = Math.Max(starMask[sy * targetWidth + (sx - 1)], arm);
                         starMask[sy * targetWidth + (sx + 1)] = Math.Max(starMask[sy * targetWidth + (sx + 1)], arm);
                         starMask[(sy - 1) * targetWidth + sx] = Math.Max(starMask[(sy - 1) * targetWidth + sx], arm);
@@ -409,13 +439,18 @@ namespace SynthwaveAssets
                     }
                 }
 
-                for (int y = 0; y < targetHeight; y++)
+                double skyBaseR = ntpBaseColor.R / 255.0;
+                double skyBaseG = ntpBaseColor.G / 255.0;
+                double skyBaseB = ntpBaseColor.B / 255.0;
+
+                Parallel.For(0, targetHeight, y =>
                 {
-                    // Seamless blend into ntp_background at top edge (0..135px)
-                    double keepTop = SmoothStep(0.0, 135.0, y);
+                    double pY = (horY - y) * pxScale;
+                    double tSky = Math.Max(0.0, Math.Min(1.0, (horY - y) / (refHeight * 0.88)));
+
                     // Subtle moire-free 6px bell-curve CRT scanline across lower horizon/grid area
                     double scanMul = 1.0;
-                    if (y > targetHeight * 0.56)
+                    if (pY < -0.02)
                     {
                         double phase = (y % 6) / 6.0;
                         double wBell = Math.Abs(phase * 2.0 - 1.0);
@@ -423,46 +458,210 @@ namespace SynthwaveAssets
                         scanMul = 1.0 - 0.032 * (1.0 - waveY);
                     }
 
+                    // Precompute sky row color
+                    double sMid = SmoothStep(0.0, 0.36, tSky);
+                    double sTop = SmoothStep(0.26, 0.92, tSky);
+                    double baseSkyR = 0.245 + (0.088 - 0.245) * sMid;
+                    double baseSkyG = 0.055 + (0.039 - 0.055) * sMid;
+                    double baseSkyB = 0.305 + (0.195 - 0.305) * sMid;
+                    baseSkyR += (skyBaseR - baseSkyR) * sTop;
+                    baseSkyG += (skyBaseG - baseSkyG) * sTop;
+                    baseSkyB += (skyBaseB - baseSkyB) * sTop;
+
+                    // Precompute floor row constants
+                    double yFloorRaw = -pY;
+                    double yFloor = Math.Max(0.0022, yFloorRaw);
+                    double depth = 0.25 / yFloor;
+                    double worldZ = depth - 0.35;
+                    double derivX = pxScale * depth * 1.75;
+                    double derivZ = Math.Max(0.0008, pxScale * 0.25 / (yFloor * yFloor));
+                    double gFracZ = Math.Abs(Frac(worldZ) - 0.5) / derivZ;
+                    double distFade = SmoothStep(0.004, 0.032, yFloorRaw);
+                    double floorT = SmoothStep(0.0, 0.34, yFloorRaw);
+                    double floorBgR = 0.095 + (0.039 - 0.095) * floorT;
+                    double floorBgG = 0.026 + (0.018 - 0.026) * floorT;
+                    double floorBgB = 0.205 + (0.088 - 0.205) * floorT;
+                    double gridMix = Math.Exp(-yFloorRaw * 5.2);
+                    double gridColR = 1.0 + (0.0 - 1.0) * gridMix;
+                    double gridColG = 0.18 + (0.94 - 0.18) * gridMix;
+                    double gridColB = 0.72 + (1.0 - 0.72) * gridMix;
+                    double sunTrackY = SmoothStep(0.42, 0.0, yFloorRaw);
+
+                    double horGlow = Math.Exp(-Math.Abs(pY) * 140.0) * 0.52;
+                    double horCore = Math.Exp(-Math.Abs(pY) * 520.0) * 0.85;
+                    double horAddG = 0.94 * (horGlow + horCore);
+                    double horAddB = 1.00 * (horGlow + horCore);
+
                     int rowOffset = y * stride;
+                    int starRowOffset = y * targetWidth;
+
                     for (int x = 0; x < targetWidth; x++)
                     {
-                        // Gentle outer left/right atmospheric edge feather (0..60px and width-60..width)
-                        double keepLeft = SmoothStep(0.0, 60.0, x);
-                        double keepRight = SmoothStep(0.0, 60.0, (targetWidth - 1) - x);
-                        double keep = keepTop * Math.Min(keepLeft, keepRight);
+                        double pX = (x - targetWidth * 0.5) * pxScale;
+                        double r, g, b;
 
-                        int idx = rowOffset + x * 3;
-                        double b = buf[idx + 0] * scanMul;
-                        double g = buf[idx + 1] * scanMul;
-                        double r = buf[idx + 2] * scanMul;
-
-                        double st = starMask[y * targetWidth + x];
-                        if (st > 0.001)
+                        if (pY >= -0.002)
                         {
-                            int kind = starKind[y * targetWidth + x];
-                            RgbColor sc = kind == 0
-                                ? new RgbColor(135, 248, 255)
-                                : (kind == 1 ? new RgbColor(255, 165, 235) : new RgbColor(242, 245, 255));
-                            r += (sc.R - r) * st;
-                            g += (sc.G - g) * st;
-                            b += (sc.B - b) * st;
+                            r = baseSkyR;
+                            g = baseSkyG;
+                            b = baseSkyB;
+
+                            // Subtle atmospheric aurora bands
+                            double aurora = Math.Sin(pX * 3.1 + 0.4) * Math.Cos(pY * 7.5 - 0.3);
+                            if (aurora > 0.0 && tSky < 1.0)
+                            {
+                                double af = aurora * (1.0 - tSky);
+                                r += 0.045 * af;
+                                g += 0.012 * af;
+                                b += 0.075 * af;
+                            }
+
+                            // Outrun Sun + Breathing Corona
+                            double pSunY = pY - sunCenterY;
+                            double sunDist = Math.Sqrt(pX * pX + pSunY * pSunY);
+                            double corona = Math.Exp(-Math.Max(0.0, sunDist - sunR) * 9.5) * 0.65;
+                            double wgX = pX * 0.75, wgY = pSunY * 1.45;
+                            double wideGlow = Math.Exp(-Math.Sqrt(wgX * wgX + wgY * wgY) * 2.9) * 0.42;
+                            double glowSum = corona + wideGlow;
+                            r += 1.00 * glowSum;
+                            g += 0.16 * glowSum;
+                            b += 0.52 * glowSum;
+
+                            // Twinkling stars
+                            double st = starMask[starRowOffset + x];
+                            if (st > 0.001)
+                            {
+                                double sunStarFade = SmoothStep(sunR * 0.95, sunR * 1.45, sunDist);
+                                double w = st * sunStarFade;
+                                int kind = starKind[starRowOffset + x];
+                                double sr = kind == 0 ? 0.52 : (kind == 1 ? 1.00 : 0.94);
+                                double sg = kind == 0 ? 0.97 : (kind == 1 ? 0.64 : 0.96);
+                                double sb = kind == 0 ? 1.00 : (kind == 1 ? 0.92 : 1.00);
+                                r += (sr - r) * w;
+                                g += (sg - g) * w;
+                                b += (sb - b) * w;
+                            }
+
+                            // Sliced Outrun Sun Disc
+                            double discMask = (1.0 - SmoothStep(sunR - pxScale * 1.5, sunR + pxScale * 1.5, sunDist))
+                                * SmoothStep(-pxScale, pxScale * 1.5, pY);
+                            if (discMask > 0.001)
+                            {
+                                double hNorm = Math.Max(0.0, Math.Min(1.0, (pSunY + sunR) / (2.0 * sunR)));
+                                double sm = SmoothStep(0.08, 0.52, hNorm);
+                                double stp = SmoothStep(0.45, 0.92, hNorm);
+                                double dr = 1.0;
+                                double dg = 0.165 + (0.42 - 0.165) * sm;
+                                double db = 0.52 + (0.26 - 0.52) * sm;
+                                dg += (0.91 - dg) * stp;
+                                db += (0.37 - db) * stp;
+
+                                double visH = Math.Max(0.0, Math.Min(1.0, (hNorm - 0.335) / 0.35));
+                                double slicePhase = Frac(visH * 5.2 + 0.15);
+                                double sliceThick = 0.42 + (0.04 - 0.42) * visH;
+                                double sliceGap = SmoothStep(sliceThick + 0.04, sliceThick - 0.015, slicePhase)
+                                    * (visH <= 0.96 ? 1.0 : 0.0)
+                                    * SmoothStep(0.96, 0.80, visH);
+                                double dm = discMask * (1.0 - sliceGap);
+                                r += (dr - r) * dm;
+                                g += (dg - g) * dm;
+                                b += (db - b) * dm;
+                            }
+
+                            // Low-Poly Wireframe Mountains across full width
+                            double xAbs = Math.Abs(pX);
+                            if (pY >= 0.0 && xAbs >= 0.19)
+                            {
+                                double side = pX >= 0.0 ? 1.0 : -1.0;
+                                double cellW = 0.105;
+                                double idx = Math.Floor(xAbs / cellW);
+                                double xL = idx * cellW;
+                                double xR = (idx + 1.0) * cellW;
+                                double hL = MtnHeight(idx, side);
+                                double hR = MtnHeight(idx + 1.0, side);
+                                double xP = (idx + 0.5) * cellW + MtnPeakOffset(idx, side);
+                                double hP = MtnHeight(idx + 0.5, side) * 1.24;
+                                double xB = (idx + 0.5) * cellW;
+
+                                double ridgeY = xAbs < xP
+                                    ? hL + (hP - hL) * Math.Max(0.0, Math.Min(1.0, (xAbs - xL) / Math.Max(1e-5, xP - xL)))
+                                    : hP + (hR - hP) * Math.Max(0.0, Math.Min(1.0, (xAbs - xP) / Math.Max(1e-5, xR - xP)));
+
+                                if (pY <= ridgeY + pxScale * 3.0)
+                                {
+                                    double inside = 1.0 - SmoothStep(ridgeY - pxScale * 1.1, ridgeY + pxScale * 1.1, pY);
+                                    double dRidge = Math.Min(SdSegment(xAbs, pY, xL, hL, xP, hP), SdSegment(xAbs, pY, xP, hP, xR, hR));
+                                    double dMesh = Math.Min(
+                                        SdSegment(xAbs, pY, xP, hP, xB, 0.0),
+                                        Math.Min(SdSegment(xAbs, pY, xL, hL, xB, 0.0), SdSegment(xAbs, pY, xR, hR, xB, 0.0))
+                                    );
+                                    double wireRidge = 1.0 - SmoothStep(pxScale * 0.7, pxScale * 2.1, dRidge);
+                                    double wireInner = (1.0 - SmoothStep(pxScale * 0.45, pxScale * 1.6, dMesh)) * inside;
+
+                                    double facet = xAbs < xP ? 0.0 : 1.0;
+                                    double darkR = 0.032 + (0.052 - 0.032) * facet;
+                                    double darkG = 0.014 + (0.020 - 0.014) * facet;
+                                    double darkB = 0.072 + (0.115 - 0.072) * facet;
+                                    double sunProx = Math.Exp(-Math.Sqrt(pX * pX + (pY - sunCenterY) * (pY - sunCenterY)) * 2.4) * 0.38;
+                                    darkR += 0.14 * sunProx;
+                                    darkG += 0.02 * sunProx;
+                                    darkB += 0.12 * sunProx;
+
+                                    double wm = SmoothStep(0.22, 0.72, xAbs) * 0.65 + SmoothStep(0.01, 0.09, pY) * 0.35;
+                                    double wireR = 0.88 + (0.00 - 0.88) * wm;
+                                    double wireG = 0.22 + (0.94 - 0.22) * wm;
+                                    double wireB = 0.96 + (1.00 - 0.96) * wm;
+
+                                    double ws = wireRidge * 0.95 + wireInner * 0.55;
+                                    double mtnR = darkR + wireR * ws;
+                                    double mtnG = darkG + wireG * ws;
+                                    double mtnB = darkB + wireB * ws;
+
+                                    r = r + (mtnR - r) * inside;
+                                    g = g + (mtnG - g) * inside;
+                                    b = b + (mtnB - b) * inside;
+
+                                    double rimAdd = wireRidge * 0.35 * (1.0 - inside);
+                                    g += 0.94 * rimAdd;
+                                    b += 1.00 * rimAdd;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Perspective Neon Floor Grid across full width
+                            double worldX = pX * depth * 1.75;
+                            double gFracX = Math.Abs(Frac(worldX) - 0.5) / Math.Max(0.0008, derivX);
+                            double dLine = Math.Min(gFracX, gFracZ);
+                            double lineCore = 1.0 - Math.Min(dLine, 1.0);
+                            double lineHalo = Math.Exp(-dLine * 0.68) * 0.28;
+                            double lineStrength = (lineCore * 0.95 + lineHalo) * distFade;
+
+                            double sunTrack = Math.Exp(-pX * pX * 16.0) * sunTrackY * 0.48;
+                            r = floorBgR + 0.55 * sunTrack + gridColR * lineStrength;
+                            g = floorBgG + 0.12 * sunTrack + gridColG * lineStrength;
+                            b = floorBgB + 0.42 * sunTrack + gridColB * lineStrength;
                         }
 
-                        // Blend seamlessly toward exact ntp_background color on outer top/left/right margins
-                        r = ntpBaseColor.R + (r - ntpBaseColor.R) * keep;
-                        g = ntpBaseColor.G + (g - ntpBaseColor.G) * keep;
-                        b = ntpBaseColor.B + (b - ntpBaseColor.B) * keep;
+                        // Electric Cyan Horizon Beam
+                        g += horAddG;
+                        b += horAddB;
+
+                        r = Math.Max(0.0, Math.Min(1.0, r)) * scanMul * 255.0;
+                        g = Math.Max(0.0, Math.Min(1.0, g)) * scanMul * 255.0;
+                        b = Math.Max(0.0, Math.Min(1.0, b)) * scanMul * 255.0;
 
                         double dither = (Bayer4x4[y & 3, x & 3] / 16.0 - 0.5) * 0.7;
-                        buf[idx + 0] = ClampByte(b + dither);
-                        buf[idx + 1] = ClampByte(g + dither);
-                        buf[idx + 2] = ClampByte(r + dither);
+                        int pxIdx = rowOffset + x * 3;
+                        buf[pxIdx + 0] = ClampByte(b + dither);
+                        buf[pxIdx + 1] = ClampByte(g + dither);
+                        buf[pxIdx + 2] = ClampByte(r + dither);
                     }
-                }
+                });
 
                 Marshal.Copy(buf, 0, data.Scan0, buf.Length);
-                scaled.UnlockBits(data);
-                SavePng(scaled, outputPath);
+                bmp.UnlockBits(data);
+                SavePng(bmp, outputPath);
             }
         }
 
@@ -1062,16 +1261,18 @@ $genTheme = ($Target -eq 'All' -or $Target -eq 'Theme')
 $genExtension = ($Target -eq 'All' -or $Target -eq 'Extension')
 
 if ($genTheme) {
-    # 1. NTP Wallpaper (1920x1080 seamless PNG)
+    # 1. NTP Wallpaper (5120x2160 full-bleed procedural PNG covering 1080p, 1440p, 4K, and 5K2K)
     [SynthwaveAssets.Generator]::BuildNtpWallpaper(
-        $sourceNtp,
         (Join-Path $imgDir 'theme_ntp_background.png'),
-        1920, 1080, $cVoidBg, 1984
+        5120, 2160, 500.0, 1200.0, $cVoidBg, 1984
     )
     if (Test-Path (Join-Path $ChromeRoot 'extension\manifest.json')) {
         $extAssetsDir = Join-Path $ChromeRoot 'extension\assets'
         New-Item -ItemType Directory -Force -Path $extAssetsDir | Out-Null
-        Copy-Item -Path (Join-Path $imgDir 'theme_ntp_background.png') -Destination (Join-Path $extAssetsDir 'ntp_wallpaper.png') -Force
+        [SynthwaveAssets.Generator]::BuildNtpWallpaper(
+            (Join-Path $extAssetsDir 'ntp_wallpaper.png'),
+            1920, 1080, 475.0, 1080.0, $cVoidBg, 1984
+        )
     }
 
     # 2. Browser Frame strips (2400x160)

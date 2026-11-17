@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "Mørkt 80'er Synthwave / Outrun-tema med glødende retrohorisont, neonlys i cyan og magenta samt tydelig tekst.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

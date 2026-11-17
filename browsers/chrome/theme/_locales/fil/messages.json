@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "Madilim na temang 1980s Synthwave / Outrun na may kumikinang na retro horizon, neon cyan at magenta, at malinaw na teksto.",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}

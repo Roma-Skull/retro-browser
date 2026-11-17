@@ -1,0 +1,10 @@
+{
+  "themeName": {
+    "message": "Neon Horizon — Synthwave",
+    "description": "Theme display name shown in Chrome Web Store and Chrome Settings."
+  },
+  "themeDescription": {
+    "message": "১৯৮০-এর Synthwave / Outrun ডার্ক থিম: উজ্জ্বল রেট্রো দিগন্ত, নিওন সায়ান ও ম্যাজেন্টা হাইলাইট এবং স্পষ্ট টেক্সট।",
+    "description": "Short theme summary (max 132 characters)."
+  }
+}
