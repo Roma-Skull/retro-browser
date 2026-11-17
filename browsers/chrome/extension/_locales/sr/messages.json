@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Ретро CRT закривљење, линије скенирања, фосфорни сјај и аналогни VHS шејдер са контролама интензитета уживо.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Укључи/искључи CRT и VHS шејдер",
+    "description": "Keyboard shortcut description."
+  }
+}

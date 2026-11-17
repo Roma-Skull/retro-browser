@@ -90,6 +90,107 @@ function Build-CrxPackage {
     }
 }
 
+function Test-PackageLocales {
+    param(
+        [Parameter(Mandatory)][string]$RootDir,
+        [Parameter(Mandatory)]$Manifest,
+        [Parameter(Mandatory)][string]$Kind
+    )
+
+    $localesDir    = Join-Path $RootDir '_locales'
+    $hasLocalesDir = Test-Path $localesDir -PathType Container
+    $hasDefaultLoc = ($Manifest.PSObject.Properties.Name -contains 'default_locale') -and -not [string]::IsNullOrWhiteSpace([string]$Manifest.default_locale)
+
+    if ($hasLocalesDir -and -not $hasDefaultLoc) {
+        throw "$Kind has _locales directory but manifest.json is missing `"default_locale`"."
+    }
+    if ($hasDefaultLoc -and -not $hasLocalesDir) {
+        throw "$Kind manifest declares default_locale '$($Manifest.default_locale)' but _locales directory is missing."
+    }
+    if (-not $hasLocalesDir) {
+        return 0
+    }
+
+    $defaultMessages = Join-Path $localesDir "$($Manifest.default_locale)\messages.json"
+    if (-not (Test-Path $defaultMessages -PathType Leaf)) {
+        throw "Missing default_locale messages file: $defaultMessages"
+    }
+
+    $msgKeys = [System.Collections.Generic.List[string]]::new()
+    $nameKey = $null
+    $descKey = $null
+    $candidates = @([string]$Manifest.name, [string]$Manifest.description)
+    if ($Manifest.PSObject.Properties.Name -contains 'action' -and $Manifest.action -and ($Manifest.action.PSObject.Properties.Name -contains 'default_title')) {
+        $candidates += [string]$Manifest.action.default_title
+    }
+    if ($Manifest.PSObject.Properties.Name -contains 'commands' -and $Manifest.commands) {
+        foreach ($cmdProp in $Manifest.commands.PSObject.Properties) {
+            if ($cmdProp.Value -and ($cmdProp.Value.PSObject.Properties.Name -contains 'description')) {
+                $candidates += [string]$cmdProp.Value.description
+            }
+        }
+    }
+
+    foreach ($fieldVal in $candidates) {
+        if ($fieldVal -match '^__MSG_([A-Za-z0-9_@]+)__$') {
+            $k = $Matches[1]
+            if (-not $msgKeys.Contains($k)) { $msgKeys.Add($k) }
+        }
+    }
+    if ([string]$Manifest.name -match '^__MSG_([A-Za-z0-9_@]+)__$') { $nameKey = $Matches[1] }
+    if ([string]$Manifest.description -match '^__MSG_([A-Za-z0-9_@]+)__$') { $descKey = $Matches[1] }
+
+    $localeDirs = @(Get-ChildItem -Path $localesDir -Directory)
+    if ($localeDirs.Count -eq 0) {
+        throw "$Kind _locales directory contains no locale subdirectories."
+    }
+
+    foreach ($locDir in $localeDirs) {
+        $msgPath = Join-Path $locDir.FullName 'messages.json'
+        if (-not (Test-Path $msgPath -PathType Leaf)) {
+            throw "Missing messages.json in $Kind locale '$($locDir.Name)'."
+        }
+        $msgs = Get-Content -Raw -Encoding UTF8 $msgPath | ConvertFrom-Json
+        foreach ($key in $msgKeys) {
+            if (-not ($msgs.PSObject.Properties.Name -contains $key)) {
+                throw "$Kind locale '$($locDir.Name)' is missing manifest message key '$key'."
+            }
+            $val = [string]$msgs.$key.message
+            if ([string]::IsNullOrWhiteSpace($val)) {
+                throw "$Kind locale '$($locDir.Name)' has empty message for '$key'."
+            }
+            if ($key -eq $nameKey -and $val.Length -gt 75) {
+                throw "$Kind locale '$($locDir.Name)' $key exceeds 75 characters ($($val.Length))."
+            }
+            if ($key -eq $descKey -and $val.Length -gt 132) {
+                throw "$Kind locale '$($locDir.Name)' $key exceeds 132 characters ($($val.Length))."
+            }
+        }
+    }
+
+    return $localeDirs.Count
+}
+
+function Copy-PackageLocales {
+    param(
+        [Parameter(Mandatory)][string]$SourceRoot,
+        [Parameter(Mandatory)][string]$StageDir
+    )
+
+    $localesDir = Join-Path $SourceRoot '_locales'
+    if (-not (Test-Path $localesDir -PathType Container)) {
+        return $false
+    }
+
+    $dstLocales = Join-Path $StageDir '_locales'
+    foreach ($locDir in (Get-ChildItem -Path $localesDir -Directory)) {
+        $dstLocDir = Join-Path $dstLocales $locDir.Name
+        New-Item -ItemType Directory -Force -Path $dstLocDir | Out-Null
+        Copy-Item -Path (Join-Path $locDir.FullName 'messages.json') -Destination (Join-Path $dstLocDir 'messages.json') -Force
+    }
+    return $true
+}
+
 $distDir = Join-Path $RepoRoot 'dist\chrome'
 $buildTheme = ($Target -eq 'All' -or $Target -eq 'Theme')
 $buildExtension = ($Target -eq 'All' -or $Target -eq 'Extension')
@@ -161,60 +262,7 @@ if ($buildTheme) {
         }
     }
 
-    $localesDir    = Join-Path $themeDir '_locales'
-    $hasLocalesDir = Test-Path $localesDir -PathType Container
-    $hasDefaultLoc = ($manifest.PSObject.Properties.Name -contains 'default_locale') -and -not [string]::IsNullOrWhiteSpace([string]$manifest.default_locale)
-
-    if ($hasLocalesDir -and -not $hasDefaultLoc) {
-        throw 'Theme has _locales directory but manifest.json is missing "default_locale".'
-    }
-    if ($hasDefaultLoc -and -not $hasLocalesDir) {
-        throw "Theme manifest declares default_locale '$($manifest.default_locale)' but _locales directory is missing."
-    }
-
-    $localeCount = 0
-    if ($hasLocalesDir) {
-        $defaultMessages = Join-Path $localesDir "$($manifest.default_locale)\messages.json"
-        if (-not (Test-Path $defaultMessages -PathType Leaf)) {
-            throw "Missing default_locale messages file: $defaultMessages"
-        }
-
-        $msgKeys = @()
-        foreach ($fieldVal in @([string]$manifest.name, [string]$manifest.description)) {
-            if ($fieldVal -match '^__MSG_([A-Za-z0-9_@]+)__$') {
-                $msgKeys += $Matches[1]
-            }
-        }
-
-        $localeDirs = @(Get-ChildItem -Path $localesDir -Directory)
-        if ($localeDirs.Count -eq 0) {
-            throw '_locales directory contains no locale subdirectories.'
-        }
-
-        foreach ($locDir in $localeDirs) {
-            $msgPath = Join-Path $locDir.FullName 'messages.json'
-            if (-not (Test-Path $msgPath -PathType Leaf)) {
-                throw "Missing messages.json in locale '$($locDir.Name)'."
-            }
-            $msgs = Get-Content -Raw -Encoding UTF8 $msgPath | ConvertFrom-Json
-            foreach ($key in $msgKeys) {
-                if (-not ($msgs.PSObject.Properties.Name -contains $key)) {
-                    throw "Locale '$($locDir.Name)' is missing manifest message key '$key'."
-                }
-                $val = [string]$msgs.$key.message
-                if ([string]::IsNullOrWhiteSpace($val)) {
-                    throw "Locale '$($locDir.Name)' has empty message for '$key'."
-                }
-                if ($key -eq 'themeName' -and $val.Length -gt 75) {
-                    throw "Locale '$($locDir.Name)' themeName exceeds 75 characters ($($val.Length))."
-                }
-                if ($key -eq 'themeDescription' -and $val.Length -gt 132) {
-                    throw "Locale '$($locDir.Name)' themeDescription exceeds 132 characters ($($val.Length))."
-                }
-            }
-            $localeCount++
-        }
-    }
+    $localeCount = Test-PackageLocales -RootDir $themeDir -Manifest $manifest -Kind 'Theme'
 
     $colorCount = @($manifest.theme.colors.PSObject.Properties).Count
     $tintCount  = @($manifest.theme.tints.PSObject.Properties).Count
@@ -243,13 +291,7 @@ if ($buildTheme) {
             }
 
             $archiveItems = @('manifest.json', 'images')
-            if ($hasLocalesDir) {
-                $dstLocales = Join-Path $stageDir '_locales'
-                foreach ($locDir in (Get-ChildItem -Path $localesDir -Directory)) {
-                    $dstLocDir = Join-Path $dstLocales $locDir.Name
-                    New-Item -ItemType Directory -Force -Path $dstLocDir | Out-Null
-                    Copy-Item -Path (Join-Path $locDir.FullName 'messages.json') -Destination (Join-Path $dstLocDir 'messages.json') -Force
-                }
+            if (Copy-PackageLocales -SourceRoot $themeDir -StageDir $stageDir) {
                 $archiveItems += '_locales'
             }
 
@@ -325,6 +367,7 @@ if ($buildExtension) {
             'newtab.css',
             'newtab.js',
             'shared\defaults.js',
+            'shared\i18n.js',
             'shared\controls.js',
             'assets\ntp_wallpaper.png',
             'icons\icon16.png',
@@ -336,7 +379,8 @@ if ($buildExtension) {
                 throw "Missing extension file: $rel"
             }
         }
-        Write-Host "Validated companion CRT/VHS shader extension ($($extRequired.Count) files)."
+        $extLocaleCount = Test-PackageLocales -RootDir $extDir -Manifest $extManifest -Kind 'Extension'
+        Write-Host "Validated companion CRT/VHS shader extension ($($extRequired.Count) files, $extLocaleCount locales)."
 
         if ($CreateZip -or $Release) {
             if (-not (Test-Path $distDir)) {
@@ -357,6 +401,7 @@ if ($buildExtension) {
                     }
                     Copy-Item -Path $srcFile -Destination $dstFile -Force
                 }
+                Copy-PackageLocales -SourceRoot $extDir -StageDir $stageDir | Out-Null
 
                 if ($CreateZip) {
                     $extZipPath = Join-Path $distDir 'neon-horizon-crt-vhs-shader.zip'

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Tab — Neon Horizon</title>
+  <title data-i18n="newTabPageTitle">New Tab — Neon Horizon</title>
   <link rel="icon" type="image/png" sizes="48x48" href="icons/icon48.png" />
   <link rel="stylesheet" href="newtab.css" />
 </head>
@@ -19,16 +19,18 @@
       </div>
 
       <form id="search-form" class="search-bar" autocomplete="off">
-        <button type="button" id="engine-btn" class="engine-btn" title="Switch search engine">Google</button>
+        <button type="button" id="engine-btn" class="engine-btn" title="Switch search engine" data-i18n-title="switchSearchEngineTitle">Google</button>
         <input
           type="text"
           id="search-input"
           class="search-input"
           placeholder="Search or enter URL..."
+          data-i18n-placeholder="searchPlaceholder"
           aria-label="Search or enter URL"
+          data-i18n-aria-label="searchAriaLabel"
           autofocus
         />
-        <button type="submit" class="search-submit" title="Search">
+        <button type="submit" class="search-submit" title="Search" data-i18n-title="searchBtnTitle">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7"></circle>
             <line x1="20" y1="20" x2="16.2" y2="16.2"></line>
@@ -36,7 +38,7 @@
         </button>
       </form>
 
-      <section class="sites-section" aria-label="Quick Sites">
+      <section class="sites-section" aria-label="Quick Sites" data-i18n-aria-label="quickSitesAriaLabel">
         <div id="sites-grid" class="sites-grid"></div>
       </section>
     </header>
@@ -44,44 +46,44 @@
 
   <!-- Floating CRT/VHS Shader Configuration Button & Drawer -->
   <div class="shader-dock">
-    <section id="crt-drawer" class="crt-drawer" hidden aria-label="New Tab CRT and VHS settings">
+    <section id="crt-drawer" class="crt-drawer" hidden aria-label="New Tab CRT and VHS settings" data-i18n-aria-label="drawerAriaLabel">
       <div class="drawer-head">
         <div>
-          <div class="drawer-title">NEW TAB CRT / VHS</div>
-          <div class="drawer-sub">WebGL2 New Tab Shader</div>
+          <div class="drawer-title" data-i18n="drawerTitle">NEW TAB CRT / VHS</div>
+          <div class="drawer-sub" data-i18n="drawerSub">WebGL2 New Tab Shader</div>
         </div>
-        <label class="power-switch" title="Toggle New Tab shader on/off">
+        <label class="power-switch" title="Toggle New Tab shader on/off" data-i18n-title="toggleNewTabShaderTitle">
           <input type="checkbox" data-role="toggle-enabled" />
           <span class="power-track"><span class="power-thumb"></span></span>
         </label>
       </div>
 
       <div class="sync-row">
-        <label class="sync-check" title="Use the same settings on New Tab as on websites">
+        <label class="sync-check" title="Use the same settings on New Tab as on websites" data-i18n-title="syncWithSitesTitle">
           <input type="checkbox" id="toggle-sync-sites" />
-          <span>Sync with sites</span>
+          <span data-i18n="syncWithSites">Sync with sites</span>
         </label>
-        <button type="button" id="btn-copy-sites" class="copy-btn" title="Copy current settings from websites">Copy</button>
+        <button type="button" id="btn-copy-sites" class="copy-btn" title="Copy current settings from websites" data-i18n-title="copyBtnTitle" data-i18n="copyBtn">Copy</button>
       </div>
 
       <div class="bg-anim-row">
-        <label class="sync-check" title="Animate neon grid flight, twinkling stars, and pulsing sun">
+        <label class="sync-check" title="Animate neon grid flight, twinkling stars, and pulsing sun" data-i18n-title="liveBgTitle">
           <input type="checkbox" id="toggle-animate-bg" />
-          <span>Live background (grid flight)</span>
+          <span data-i18n="liveBg">Live background (grid flight)</span>
         </label>
       </div>
 
       <div class="presets">
-        <button class="preset-btn" data-preset="soft" type="button">Soft CRT</button>
-        <button class="preset-btn" data-preset="outrun" type="button">Outrun 84</button>
-        <button class="preset-btn" data-preset="vhs" type="button">VHS Tape</button>
-        <button class="preset-btn" data-preset="minimal" type="button">Minimal</button>
+        <button class="preset-btn" data-preset="soft" type="button" data-i18n="presetSoft">Soft CRT</button>
+        <button class="preset-btn" data-preset="outrun" type="button" data-i18n="presetOutrun">Outrun 84</button>
+        <button class="preset-btn" data-preset="vhs" type="button" data-i18n="presetVhs">VHS Tape</button>
+        <button class="preset-btn" data-preset="minimal" type="button" data-i18n="presetMinimal">Minimal</button>
       </div>
 
       <div class="sliders">
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-curvature">Screen curvature (CRT)</label>
+            <label for="nt-curvature" data-i18n="labelCurvatureCrt">Screen curvature (CRT)</label>
             <span class="val" data-val="curvature">40%</span>
           </div>
           <input type="range" id="nt-curvature" data-slider="curvature" min="0" max="100" value="40" />
@@ -89,7 +91,7 @@
 
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-scanlines">Interlaced scanlines</label>
+            <label for="nt-scanlines" data-i18n="labelScanlines">Interlaced scanlines</label>
             <span class="val" data-val="scanlines">52%</span>
           </div>
           <input type="range" id="nt-scanlines" data-slider="scanlines" min="0" max="100" value="52" />
@@ -97,7 +99,7 @@
 
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-bloom">Phosphor bloom glow</label>
+            <label for="nt-bloom" data-i18n="labelBloom">Phosphor bloom glow</label>
             <span class="val" data-val="bloom">36%</span>
           </div>
           <input type="range" id="nt-bloom" data-slider="bloom" min="0" max="100" value="36" />
@@ -105,7 +107,7 @@
 
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-vhs">VHS tape &amp; chromaticity</label>
+            <label for="nt-vhs" data-i18n="labelVhs">VHS tape &amp; chromaticity</label>
             <span class="val" data-val="vhs">75%</span>
           </div>
           <input type="range" id="nt-vhs" data-slider="vhs" min="0" max="100" value="75" />
@@ -113,7 +115,7 @@
 
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-sweep">Scan sweep bar</label>
+            <label for="nt-sweep" data-i18n="labelSweep">Scan sweep bar</label>
             <span class="val" data-val="sweep">60%</span>
           </div>
           <input type="range" id="nt-sweep" data-slider="sweep" min="0" max="100" value="60" />
@@ -121,7 +123,7 @@
 
         <div class="slider-row">
           <div class="slider-head">
-            <label for="nt-vignette">Glass &amp; vignette</label>
+            <label for="nt-vignette" data-i18n="labelVignette">Glass &amp; vignette</label>
             <span class="val" data-val="vignette">48%</span>
           </div>
           <input type="range" id="nt-vignette" data-slider="vignette" min="0" max="100" value="48" />
@@ -131,9 +133,9 @@
       <div class="drawer-foot">
         <label class="anim-toggle">
           <input type="checkbox" data-role="toggle-animate" />
-          <span>Scan animation</span>
+          <span data-i18n="scanAnimation">Scan animation</span>
         </label>
-        <button type="button" class="reset-btn" data-role="reset-btn">Reset</button>
+        <button type="button" class="reset-btn" data-role="reset-btn" data-i18n="resetBtn">Reset</button>
       </div>
     </section>
 
@@ -146,23 +148,24 @@
   <!-- Add Quick Site Modal -->
   <div id="add-modal" class="modal-backdrop" hidden>
     <form id="add-site-form" class="modal-card" autocomplete="off">
-      <div class="modal-title">Add Quick Site</div>
+      <div class="modal-title" data-i18n="modalAddTitle">Add Quick Site</div>
       <label class="field-label">
-        <span>Name</span>
-        <input type="text" id="add-title" placeholder="e.g. GitHub" maxlength="32" required />
+        <span data-i18n="modalFieldName">Name</span>
+        <input type="text" id="add-title" placeholder="e.g. GitHub" data-i18n-placeholder="modalPlaceholderName" maxlength="32" required />
       </label>
       <label class="field-label">
-        <span>Address (URL)</span>
+        <span data-i18n="modalFieldAddress">Address (URL)</span>
         <input type="text" id="add-url" placeholder="https://github.com" required />
       </label>
       <div class="modal-actions">
-        <button type="button" id="btn-cancel-add" class="btn-secondary">Cancel</button>
-        <button type="submit" class="btn-primary">Add</button>
+        <button type="button" id="btn-cancel-add" class="btn-secondary" data-i18n="modalCancel">Cancel</button>
+        <button type="submit" class="btn-primary" data-i18n="modalAdd">Add</button>
       </div>
     </form>
   </div>
 
   <script src="shared/defaults.js"></script>
+  <script src="shared/i18n.js"></script>
   <script src="shared/controls.js"></script>
   <script src="newtab.js"></script>
 </body>

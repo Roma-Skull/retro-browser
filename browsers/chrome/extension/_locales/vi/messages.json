@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Độ cong CRT cổ điển, đường quét, ánh sáng phốt-pho và lớp phủ shader VHS analog với tùy chỉnh trực tiếp.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Bật/tắt shader CRT & VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

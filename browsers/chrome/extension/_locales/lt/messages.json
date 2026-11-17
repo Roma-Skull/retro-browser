@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Retro CRT išlinkimas, skenavimo linijos, fosforo švytėjimas ir analoginis VHS šešėlis su tiesioginiu valdymu.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Įjungti / išjungti CRT ir VHS efektą",
+    "description": "Keyboard shortcut description."
+  }
+}

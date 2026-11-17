@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Curbură CRT retro, linii de scanare, strălucire fosfor și shader VHS analogic cu controale de intensitate live.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Activează/dezactivează shaderul CRT și VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

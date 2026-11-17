@@ -1,7 +1,7 @@
-# Chrome Web Store Listing — Neon Horizon — CRT & VHS Shader (Extension v1.0.1)
+# Chrome Web Store Listing — Neon Horizon — CRT & VHS Shader (Extension v1.0.2)
 
 ## Upload Package
-- **File to upload:** `dist/chrome/releases/extension-v1.0.1/neon-horizon-crt-vhs-shader-v1.0.1.zip`
+- **File to upload:** `dist/chrome/releases/extension-v1.0.2/neon-horizon-crt-vhs-shader-v1.0.2.zip`
 
 ## Store Icon & Promotional Graphics (`browsers/chrome/store/extension/`)
 - **Store icon (`128x128` 32-bit RGBA PNG, `96x96` visual + `16px` transparent padding):** `store-icon-128.png`

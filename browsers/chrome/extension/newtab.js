@@ -12,6 +12,7 @@
     resolveNewTabProfile
   } = globalThis.NeonHorizonDefaults;
   const { createShaderProfileController } = globalThis.NeonHorizonControls;
+  const { t, getUILanguage, applyI18n } = globalThis.NeonHorizonI18n;
 
   const SEARCH_ENGINES = [
     { id: 'google', label: 'Google', buildUrl: (q) => `https://www.google.com/search?q=${encodeURIComponent(q)}` },
@@ -849,7 +850,12 @@
   // Clock
   const clockTimeEl = document.getElementById('clock-time');
   const clockDateEl = document.getElementById('clock-date');
-  const dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
+  let dateFmt;
+  try {
+    dateFmt = new Intl.DateTimeFormat(getUILanguage().replace('_', '-'), { weekday: 'long', day: 'numeric', month: 'long' });
+  } catch (_) {
+    dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
 
   function updateClock() {
     const now = new Date();
@@ -954,7 +960,7 @@
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'site-remove';
-      removeBtn.title = 'Remove';
+      removeBtn.title = t('removeSiteTitle', undefined, 'Remove');
       removeBtn.textContent = '×';
       removeBtn.addEventListener('click', (ev) => {
         ev.preventDefault();
@@ -971,7 +977,7 @@
       const addTile = document.createElement('button');
       addTile.type = 'button';
       addTile.className = 'site-tile is-add';
-      addTile.title = 'Add site';
+      addTile.title = t('addSiteTitle', undefined, 'Add site');
 
       const badge = document.createElement('div');
       badge.className = 'site-monogram';
@@ -979,7 +985,7 @@
 
       const label = document.createElement('div');
       label.className = 'site-name';
-      label.textContent = 'Add';
+      label.textContent = t('addSiteLabel', undefined, 'Add');
 
       addTile.append(badge, label);
       addTile.addEventListener('click', () => {
@@ -1151,6 +1157,7 @@
   });
 
   async function init() {
+    applyI18n();
     updateClock();
     setInterval(updateClock, 15000);
 

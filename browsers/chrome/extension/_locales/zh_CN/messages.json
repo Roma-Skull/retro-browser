@@ -1,0 +1,230 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "复古 CRT 曲率、隔行扫描线、荧光粉辉光与模拟 VHS 着色器叠层，支持实时强度调节与动态新标签页。",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "开启/关闭 CRT 与 VHS 着色器",
+    "description": "Keyboard shortcut description."
+  },
+  "popupSubtitle": {
+    "message": "CRT 与 VHS 着色器",
+    "description": "UI string (popupSubtitle)."
+  },
+  "toggleShaderTitle": {
+    "message": "开启/关闭着色器 (Alt+Shift+V)",
+    "description": "UI string (toggleShaderTitle)."
+  },
+  "profileAriaLabel": {
+    "message": "设置配置文件",
+    "description": "UI string (profileAriaLabel)."
+  },
+  "tabWebsites": {
+    "message": "网站",
+    "description": "UI string (tabWebsites)."
+  },
+  "tabNewTab": {
+    "message": "新标签页",
+    "description": "UI string (tabNewTab)."
+  },
+  "checkingTab": {
+    "message": "正在检查标签页...",
+    "description": "UI string (checkingTab)."
+  },
+  "siteInfoOpenWebpage": {
+    "message": "网站设置（请打开网页标签页）",
+    "description": "UI string (siteInfoOpenWebpage)."
+  },
+  "siteInfoLocalFile": {
+    "message": "本地文件 (file://)",
+    "description": "UI string (siteInfoLocalFile)."
+  },
+  "siteInfoInternalPage": {
+    "message": "Chrome 内部页面",
+    "description": "UI string (siteInfoInternalPage)."
+  },
+  "enableForHost": {
+    "message": "在 $HOST$ 上启用",
+    "description": "UI string (enableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "disableForHost": {
+    "message": "在 $HOST$ 上停用",
+    "description": "UI string (disableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "syncWithSites": {
+    "message": "与网站同步",
+    "description": "UI string (syncWithSites)."
+  },
+  "syncWithSitesTitle": {
+    "message": "新标签页使用与网站相同的设置",
+    "description": "UI string (syncWithSitesTitle)."
+  },
+  "copyBtn": {
+    "message": "复制",
+    "description": "UI string (copyBtn)."
+  },
+  "copyBtnTitle": {
+    "message": "从网站设置复制",
+    "description": "UI string (copyBtnTitle)."
+  },
+  "liveBg": {
+    "message": "动态背景（网格飞行）",
+    "description": "UI string (liveBg)."
+  },
+  "liveBgTitle": {
+    "message": "启用霓虹网格飞行、闪烁星空与脉动太阳动画",
+    "description": "UI string (liveBgTitle)."
+  },
+  "presetsAriaLabel": {
+    "message": "预设",
+    "description": "UI string (presetsAriaLabel)."
+  },
+  "presetSoft": {
+    "message": "柔和 CRT",
+    "description": "UI string (presetSoft)."
+  },
+  "presetOutrun": {
+    "message": "Outrun 84",
+    "description": "UI string (presetOutrun)."
+  },
+  "presetVhs": {
+    "message": "VHS 录像带",
+    "description": "UI string (presetVhs)."
+  },
+  "presetMinimal": {
+    "message": "极简",
+    "description": "UI string (presetMinimal)."
+  },
+  "labelCurvatureCrt": {
+    "message": "屏幕曲率 (CRT)",
+    "description": "UI string (labelCurvatureCrt)."
+  },
+  "labelCurvatureWebgl": {
+    "message": "屏幕曲率 (WebGL2)",
+    "description": "UI string (labelCurvatureWebgl)."
+  },
+  "labelScanlines": {
+    "message": "隔行扫描线",
+    "description": "UI string (labelScanlines)."
+  },
+  "labelBloom": {
+    "message": "荧光粉辉光",
+    "description": "UI string (labelBloom)."
+  },
+  "labelVhs": {
+    "message": "VHS 磁带与色差",
+    "description": "UI string (labelVhs)."
+  },
+  "labelSweep": {
+    "message": "扫描条纹",
+    "description": "UI string (labelSweep)."
+  },
+  "labelVignette": {
+    "message": "玻璃与暗角",
+    "description": "UI string (labelVignette)."
+  },
+  "scanAnimation": {
+    "message": "扫描动画",
+    "description": "UI string (scanAnimation)."
+  },
+  "resetBtn": {
+    "message": "重置",
+    "description": "UI string (resetBtn)."
+  },
+  "quickTogglePrefix": {
+    "message": "快速切换：",
+    "description": "UI string (quickTogglePrefix)."
+  },
+  "newTabPageTitle": {
+    "message": "新标签页 — Neon Horizon",
+    "description": "UI string (newTabPageTitle)."
+  },
+  "switchSearchEngineTitle": {
+    "message": "切换搜索引擎",
+    "description": "UI string (switchSearchEngineTitle)."
+  },
+  "searchPlaceholder": {
+    "message": "搜索或输入网址...",
+    "description": "UI string (searchPlaceholder)."
+  },
+  "searchAriaLabel": {
+    "message": "搜索或输入网址",
+    "description": "UI string (searchAriaLabel)."
+  },
+  "searchBtnTitle": {
+    "message": "搜索",
+    "description": "UI string (searchBtnTitle)."
+  },
+  "quickSitesAriaLabel": {
+    "message": "快捷网站",
+    "description": "UI string (quickSitesAriaLabel)."
+  },
+  "drawerAriaLabel": {
+    "message": "新标签页 CRT 与 VHS 设置",
+    "description": "UI string (drawerAriaLabel)."
+  },
+  "drawerTitle": {
+    "message": "新标签页 CRT / VHS",
+    "description": "UI string (drawerTitle)."
+  },
+  "drawerSub": {
+    "message": "WebGL2 新标签页着色器",
+    "description": "UI string (drawerSub)."
+  },
+  "toggleNewTabShaderTitle": {
+    "message": "开启/关闭新标签页着色器",
+    "description": "UI string (toggleNewTabShaderTitle)."
+  },
+  "removeSiteTitle": {
+    "message": "移除",
+    "description": "UI string (removeSiteTitle)."
+  },
+  "addSiteTitle": {
+    "message": "添加网站",
+    "description": "UI string (addSiteTitle)."
+  },
+  "addSiteLabel": {
+    "message": "添加",
+    "description": "UI string (addSiteLabel)."
+  },
+  "modalAddTitle": {
+    "message": "添加快捷网站",
+    "description": "UI string (modalAddTitle)."
+  },
+  "modalFieldName": {
+    "message": "名称",
+    "description": "UI string (modalFieldName)."
+  },
+  "modalPlaceholderName": {
+    "message": "例如 GitHub",
+    "description": "UI string (modalPlaceholderName)."
+  },
+  "modalFieldAddress": {
+    "message": "网址 (URL)",
+    "description": "UI string (modalFieldAddress)."
+  },
+  "modalCancel": {
+    "message": "取消",
+    "description": "UI string (modalCancel)."
+  },
+  "modalAdd": {
+    "message": "添加",
+    "description": "UI string (modalAdd)."
+  }
+}

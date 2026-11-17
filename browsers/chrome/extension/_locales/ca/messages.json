@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Curvatura CRT retro, línies d'exploració, resplendor de fòsfor i filtre VHS analògic amb controls d'intensitat en viu.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Activa/desactiva el filtre CRT i VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

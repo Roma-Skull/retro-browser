@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Retro CRT curvature, mga scanline, phosphor glow, at analog VHS shader overlay na may live na mga kontrol.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "I-on/off ang CRT at VHS shader",
+    "description": "Keyboard shortcut description."
+  }
+}

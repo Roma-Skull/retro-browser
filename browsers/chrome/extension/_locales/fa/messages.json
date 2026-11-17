@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "انحنای CRT رترو، خطوط اسکن، درخشش فسفری و شیدر VHS آنالوگ با کنترل زنده شدت و برگه جدید متحرک.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "روشن/خاموش کردن شیدر CRT و VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

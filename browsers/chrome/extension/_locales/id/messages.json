@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Kelengkungan CRT retro, garis pindai, pendar fosfor, dan overlay shader VHS analog dengan kontrol intensitas langsung.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Aktifkan/nonaktifkan shader CRT & VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

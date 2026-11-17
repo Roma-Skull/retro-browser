@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Retro CRT-kaarevuus, juovat, fosforihehku ja analoginen VHS-varjostin reaaliaikaisilla voimakkuussäätimillä.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Ota CRT- ja VHS-varjostin käyttöön / pois",
+    "description": "Keyboard shortcut description."
+  }
+}

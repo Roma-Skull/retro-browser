@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neon Horizon — CRT &amp; VHS Shader</title>
+  <title data-i18n="extName">Neon Horizon — CRT &amp; VHS Shader</title>
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
@@ -13,10 +13,10 @@
         <img src="icons/icon48.png" alt="" class="logo" />
         <div>
           <div class="title">NEON HORIZON</div>
-          <div class="subtitle">CRT &amp; VHS Shader</div>
+          <div class="subtitle" data-i18n="popupSubtitle">CRT &amp; VHS Shader</div>
         </div>
       </div>
-      <label class="power-switch" title="Toggle shader on/off (Alt+Shift+V)">
+      <label class="power-switch" title="Toggle shader on/off (Alt+Shift+V)" data-i18n-title="toggleShaderTitle">
         <input type="checkbox" id="toggle-enabled" data-role="toggle-enabled" />
         <span class="power-track">
           <span class="power-thumb"></span>
@@ -24,44 +24,44 @@
       </label>
     </header>
 
-    <div class="scope-tabs" role="tablist" aria-label="Settings profile">
-      <button id="scope-sites" class="scope-tab active" data-scope="sites" type="button" role="tab" aria-selected="true">Websites</button>
-      <button id="scope-newtab" class="scope-tab" data-scope="newtab" type="button" role="tab" aria-selected="false">New Tab</button>
+    <div class="scope-tabs" role="tablist" aria-label="Settings profile" data-i18n-aria-label="profileAriaLabel">
+      <button id="scope-sites" class="scope-tab active" data-scope="sites" type="button" role="tab" aria-selected="true" data-i18n="tabWebsites">Websites</button>
+      <button id="scope-newtab" class="scope-tab" data-scope="newtab" type="button" role="tab" aria-selected="false" data-i18n="tabNewTab">New Tab</button>
     </div>
 
     <div class="site-row" id="site-row">
       <button id="toggle-site" class="site-btn" type="button">
         <span class="site-dot"></span>
-        <span id="site-label">Checking tab...</span>
+        <span id="site-label" data-i18n="checkingTab">Checking tab...</span>
       </button>
     </div>
 
     <div class="sync-row" id="newtab-sync-row" hidden>
-      <label class="sync-check" title="Use the same settings on New Tab as on websites">
+      <label class="sync-check" title="Use the same settings on New Tab as on websites" data-i18n-title="syncWithSitesTitle">
         <input type="checkbox" id="popup-sync-sites" />
-        <span>Sync with sites</span>
+        <span data-i18n="syncWithSites">Sync with sites</span>
       </label>
-      <button type="button" id="popup-copy-sites" class="copy-btn" title="Copy settings from websites">Copy</button>
+      <button type="button" id="popup-copy-sites" class="copy-btn" title="Copy settings from websites" data-i18n-title="copyBtnTitle" data-i18n="copyBtn">Copy</button>
     </div>
 
     <div class="bg-anim-row" id="newtab-animbg-row" hidden>
-      <label class="sync-check" title="Animate neon grid flight, twinkling stars, and pulsing sun">
+      <label class="sync-check" title="Animate neon grid flight, twinkling stars, and pulsing sun" data-i18n-title="liveBgTitle">
         <input type="checkbox" id="popup-animate-bg" />
-        <span>Live background (grid flight)</span>
+        <span data-i18n="liveBg">Live background (grid flight)</span>
       </label>
     </div>
 
-    <section class="presets" aria-label="Presets">
-      <button class="preset-btn" data-preset="soft" type="button">Soft CRT</button>
-      <button class="preset-btn" data-preset="outrun" type="button">Outrun 84</button>
-      <button class="preset-btn" data-preset="vhs" type="button">VHS Tape</button>
-      <button class="preset-btn" data-preset="minimal" type="button">Minimal</button>
+    <section class="presets" aria-label="Presets" data-i18n-aria-label="presetsAriaLabel">
+      <button class="preset-btn" data-preset="soft" type="button" data-i18n="presetSoft">Soft CRT</button>
+      <button class="preset-btn" data-preset="outrun" type="button" data-i18n="presetOutrun">Outrun 84</button>
+      <button class="preset-btn" data-preset="vhs" type="button" data-i18n="presetVhs">VHS Tape</button>
+      <button class="preset-btn" data-preset="minimal" type="button" data-i18n="presetMinimal">Minimal</button>
     </section>
 
     <section class="sliders">
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-curvature" id="label-curvature">Screen curvature (CRT)</label>
+          <label for="slider-curvature" id="label-curvature" data-i18n="labelCurvatureCrt">Screen curvature (CRT)</label>
           <span class="val" id="val-curvature" data-val="curvature">40%</span>
         </div>
         <input type="range" id="slider-curvature" data-slider="curvature" min="0" max="100" value="40" />
@@ -69,7 +69,7 @@
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-scanlines">Interlaced scanlines</label>
+          <label for="slider-scanlines" data-i18n="labelScanlines">Interlaced scanlines</label>
           <span class="val" id="val-scanlines" data-val="scanlines">52%</span>
         </div>
         <input type="range" id="slider-scanlines" data-slider="scanlines" min="0" max="100" value="52" />
@@ -77,7 +77,7 @@
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-bloom">Phosphor bloom glow</label>
+          <label for="slider-bloom" data-i18n="labelBloom">Phosphor bloom glow</label>
           <span class="val" id="val-bloom" data-val="bloom">36%</span>
         </div>
         <input type="range" id="slider-bloom" data-slider="bloom" min="0" max="100" value="36" />
@@ -85,7 +85,7 @@
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-vhs">VHS tape &amp; chromaticity</label>
+          <label for="slider-vhs" data-i18n="labelVhs">VHS tape &amp; chromaticity</label>
           <span class="val" id="val-vhs" data-val="vhs">75%</span>
         </div>
         <input type="range" id="slider-vhs" data-slider="vhs" min="0" max="100" value="75" />
@@ -93,7 +93,7 @@
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-sweep">Scan sweep bar</label>
+          <label for="slider-sweep" data-i18n="labelSweep">Scan sweep bar</label>
           <span class="val" id="val-sweep" data-val="sweep">60%</span>
         </div>
         <input type="range" id="slider-sweep" data-slider="sweep" min="0" max="100" value="60" />
@@ -101,7 +101,7 @@
 
       <div class="slider-row">
         <div class="slider-head">
-          <label for="slider-vignette">Glass &amp; vignette</label>
+          <label for="slider-vignette" data-i18n="labelVignette">Glass &amp; vignette</label>
           <span class="val" id="val-vignette" data-val="vignette">48%</span>
         </div>
         <input type="range" id="slider-vignette" data-slider="vignette" min="0" max="100" value="48" />
@@ -111,15 +111,16 @@
     <footer class="footer">
       <label class="anim-toggle">
         <input type="checkbox" id="toggle-animate" data-role="toggle-animate" />
-        <span>Scan animation</span>
+        <span data-i18n="scanAnimation">Scan animation</span>
       </label>
-      <button id="btn-reset" data-role="reset-btn" class="reset-btn" type="button">Reset</button>
+      <button id="btn-reset" data-role="reset-btn" class="reset-btn" type="button" data-i18n="resetBtn">Reset</button>
     </footer>
 
-    <div class="hotkey-hint">Quick toggle: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></div>
+    <div class="hotkey-hint"><span data-i18n="quickTogglePrefix">Quick toggle:</span> <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></div>
   </div>
 
   <script src="shared/defaults.js"></script>
+  <script src="shared/i18n.js"></script>
   <script src="shared/controls.js"></script>
   <script src="popup.js"></script>
 </body>

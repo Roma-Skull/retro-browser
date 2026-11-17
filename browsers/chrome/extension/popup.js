@@ -9,6 +9,7 @@
     resolveNewTabProfile
   } = globalThis.NeonHorizonDefaults;
   const { createShaderProfileController } = globalThis.NeonHorizonControls;
+  const { t, applyI18n } = globalThis.NeonHorizonI18n;
 
   let state = normalizeSettings(DEFAULT_SETTINGS);
   let activeScope = 'sites'; // 'sites' | 'newtab'
@@ -43,7 +44,9 @@
     siteRow.hidden = isNewTabScope;
     newTabSyncRow.hidden = !isNewTabScope;
     newTabAnimBgRow.hidden = !isNewTabScope;
-    curvatureLabel.textContent = isNewTabScope ? 'Screen curvature (WebGL2)' : 'Screen curvature (CRT)';
+    curvatureLabel.textContent = isNewTabScope
+      ? t('labelCurvatureWebgl', undefined, 'Screen curvature (WebGL2)')
+      : t('labelCurvatureCrt', undefined, 'Screen curvature (CRT)');
 
     const profile = profileCtrl ? profileCtrl.render() : state;
     document.body.classList.toggle('is-disabled', !profile.enabled);
@@ -56,19 +59,19 @@
       toggleSiteBtn.disabled = true;
       toggleSiteBtn.classList.remove('is-excluded');
       if (activeIsExtensionNewTab) {
-        siteLabel.textContent = 'Website settings (open a webpage tab)';
+        siteLabel.textContent = t('siteInfoOpenWebpage', undefined, 'Website settings (open a webpage tab)');
       } else if (activeProtocol === 'file:') {
-        siteLabel.textContent = 'Local file (file://)';
+        siteLabel.textContent = t('siteInfoLocalFile', undefined, 'Local file (file://)');
       } else {
-        siteLabel.textContent = 'Chrome internal page (no website active)';
+        siteLabel.textContent = t('siteInfoInternalPage', undefined, 'Chrome internal page (no website active)');
       }
     } else {
       const excluded = state.disabledHosts.includes(activeHostname);
       toggleSiteBtn.disabled = false;
       toggleSiteBtn.classList.toggle('is-excluded', excluded);
       siteLabel.textContent = excluded
-        ? `Enable for ${activeHostname}`
-        : `Disable for ${activeHostname}`;
+        ? t('enableForHost', [activeHostname], `Enable for ${activeHostname}`)
+        : t('disableForHost', [activeHostname], `Disable for ${activeHostname}`);
     }
   }
 
@@ -197,6 +200,7 @@
   });
 
   async function init() {
+    applyI18n();
     const [tabData, stored] = await Promise.all([
       chrome.tabs.query({ active: true, currentWindow: true }),
       chrome.storage.local.get(STORAGE_KEY)

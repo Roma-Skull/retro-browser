@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "เอฟเฟกต์จอโค้ง CRT ย้อนยุค เส้นสแกน แสงฟอสเฟอร์ และเชดเดอร์ VHS แอนะล็อก พร้อมตัวปรับความเข้มแบบเรียลไทม์",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "เปิด/ปิดเชดเดอร์ CRT และ VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "የሬትሮ CRT መጠምዘዝ፣ ስካንላይን፣ የፎስፈር ብርሃን እና የVHS ሼደር ከቀጥታ መቆጣጠሪያዎች ጋር።",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "የCRT እና VHS ሼደርን አብራ/አጥፋ",
+    "description": "Keyboard shortcut description."
+  }
+}

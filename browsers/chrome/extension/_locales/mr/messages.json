@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "लाइव्ह नियंत्रणांसह रेट्रो CRT वक्रता, स्कॅनलाइन्स, फॉस्फर ग्लो आणि अ‍ॅनालॉग VHS शेडर ओव्हरले.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "CRT आणि VHS शेडर चालू/बंद करा",
+    "description": "Keyboard shortcut description."
+  }
+}

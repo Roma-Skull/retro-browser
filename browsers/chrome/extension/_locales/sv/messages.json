@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Retro CRT-krökning, sveplinjer, fosforgöd och analog VHS-shader med reglage för intensitet i realtid.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Slå på/av CRT- och VHS-shader",
+    "description": "Keyboard shortcut description."
+  }
+}

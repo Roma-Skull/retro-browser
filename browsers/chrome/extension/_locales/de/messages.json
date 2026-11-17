@@ -1,0 +1,230 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Retro-CRT-Wölbung, Scanlines, Phosphor-Glow und analoger VHS-Shader mit Live-Intensitätsreglern und animiertem Neuer-Tab.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "CRT- & VHS-Shader ein-/ausschalten",
+    "description": "Keyboard shortcut description."
+  },
+  "popupSubtitle": {
+    "message": "CRT- & VHS-Shader",
+    "description": "UI string (popupSubtitle)."
+  },
+  "toggleShaderTitle": {
+    "message": "Shader ein-/ausschalten (Alt+Shift+V)",
+    "description": "UI string (toggleShaderTitle)."
+  },
+  "profileAriaLabel": {
+    "message": "Einstellungsprofil",
+    "description": "UI string (profileAriaLabel)."
+  },
+  "tabWebsites": {
+    "message": "Websites",
+    "description": "UI string (tabWebsites)."
+  },
+  "tabNewTab": {
+    "message": "Neuer Tab",
+    "description": "UI string (tabNewTab)."
+  },
+  "checkingTab": {
+    "message": "Tab wird geprüft...",
+    "description": "UI string (checkingTab)."
+  },
+  "siteInfoOpenWebpage": {
+    "message": "Website-Einstellungen (Webseite öffnen)",
+    "description": "UI string (siteInfoOpenWebpage)."
+  },
+  "siteInfoLocalFile": {
+    "message": "Lokale Datei (file://)",
+    "description": "UI string (siteInfoLocalFile)."
+  },
+  "siteInfoInternalPage": {
+    "message": "Interne Chrome-Seite",
+    "description": "UI string (siteInfoInternalPage)."
+  },
+  "enableForHost": {
+    "message": "Für $HOST$ aktivieren",
+    "description": "UI string (enableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "disableForHost": {
+    "message": "Für $HOST$ deaktivieren",
+    "description": "UI string (disableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "syncWithSites": {
+    "message": "Mit Websites sync.",
+    "description": "UI string (syncWithSites)."
+  },
+  "syncWithSitesTitle": {
+    "message": "Website-Einstellungen auf dem Neuen Tab verwenden",
+    "description": "UI string (syncWithSitesTitle)."
+  },
+  "copyBtn": {
+    "message": "Kopieren",
+    "description": "UI string (copyBtn)."
+  },
+  "copyBtnTitle": {
+    "message": "Einstellungen von Websites kopieren",
+    "description": "UI string (copyBtnTitle)."
+  },
+  "liveBg": {
+    "message": "Live-Hintergrund (Gitterflug)",
+    "description": "UI string (liveBg)."
+  },
+  "liveBgTitle": {
+    "message": "Neon-Gitterflug, funkelnde Sterne und Sonne animieren",
+    "description": "UI string (liveBgTitle)."
+  },
+  "presetsAriaLabel": {
+    "message": "Voreinstellungen",
+    "description": "UI string (presetsAriaLabel)."
+  },
+  "presetSoft": {
+    "message": "Sanftes CRT",
+    "description": "UI string (presetSoft)."
+  },
+  "presetOutrun": {
+    "message": "Outrun 84",
+    "description": "UI string (presetOutrun)."
+  },
+  "presetVhs": {
+    "message": "VHS-Kassette",
+    "description": "UI string (presetVhs)."
+  },
+  "presetMinimal": {
+    "message": "Minimal",
+    "description": "UI string (presetMinimal)."
+  },
+  "labelCurvatureCrt": {
+    "message": "Bildschirmwölbung (CRT)",
+    "description": "UI string (labelCurvatureCrt)."
+  },
+  "labelCurvatureWebgl": {
+    "message": "Bildschirmwölbung (WebGL2)",
+    "description": "UI string (labelCurvatureWebgl)."
+  },
+  "labelScanlines": {
+    "message": "Zeilensprung-Scanlines",
+    "description": "UI string (labelScanlines)."
+  },
+  "labelBloom": {
+    "message": "Phosphor-Bloom",
+    "description": "UI string (labelBloom)."
+  },
+  "labelVhs": {
+    "message": "VHS-Band & Chromatik",
+    "description": "UI string (labelVhs)."
+  },
+  "labelSweep": {
+    "message": "Laufbalken",
+    "description": "UI string (labelSweep)."
+  },
+  "labelVignette": {
+    "message": "Glas & Vignette",
+    "description": "UI string (labelVignette)."
+  },
+  "scanAnimation": {
+    "message": "Scan-Animation",
+    "description": "UI string (scanAnimation)."
+  },
+  "resetBtn": {
+    "message": "Zurücksetzen",
+    "description": "UI string (resetBtn)."
+  },
+  "quickTogglePrefix": {
+    "message": "Schnellumschalter:",
+    "description": "UI string (quickTogglePrefix)."
+  },
+  "newTabPageTitle": {
+    "message": "Neuer Tab — Neon Horizon",
+    "description": "UI string (newTabPageTitle)."
+  },
+  "switchSearchEngineTitle": {
+    "message": "Suchmaschine wechseln",
+    "description": "UI string (switchSearchEngineTitle)."
+  },
+  "searchPlaceholder": {
+    "message": "Suchen oder URL eingeben...",
+    "description": "UI string (searchPlaceholder)."
+  },
+  "searchAriaLabel": {
+    "message": "Suchen oder URL eingeben",
+    "description": "UI string (searchAriaLabel)."
+  },
+  "searchBtnTitle": {
+    "message": "Suchen",
+    "description": "UI string (searchBtnTitle)."
+  },
+  "quickSitesAriaLabel": {
+    "message": "Schnellzugriff",
+    "description": "UI string (quickSitesAriaLabel)."
+  },
+  "drawerAriaLabel": {
+    "message": "Neuer-Tab CRT- und VHS-Einstellungen",
+    "description": "UI string (drawerAriaLabel)."
+  },
+  "drawerTitle": {
+    "message": "NEUER TAB CRT / VHS",
+    "description": "UI string (drawerTitle)."
+  },
+  "drawerSub": {
+    "message": "WebGL2 Neuer-Tab-Shader",
+    "description": "UI string (drawerSub)."
+  },
+  "toggleNewTabShaderTitle": {
+    "message": "Neuer-Tab-Shader ein-/ausschalten",
+    "description": "UI string (toggleNewTabShaderTitle)."
+  },
+  "removeSiteTitle": {
+    "message": "Entfernen",
+    "description": "UI string (removeSiteTitle)."
+  },
+  "addSiteTitle": {
+    "message": "Seite hinzufügen",
+    "description": "UI string (addSiteTitle)."
+  },
+  "addSiteLabel": {
+    "message": "Hinzufügen",
+    "description": "UI string (addSiteLabel)."
+  },
+  "modalAddTitle": {
+    "message": "Schnellzugriff hinzufügen",
+    "description": "UI string (modalAddTitle)."
+  },
+  "modalFieldName": {
+    "message": "Name",
+    "description": "UI string (modalFieldName)."
+  },
+  "modalPlaceholderName": {
+    "message": "z. B. GitHub",
+    "description": "UI string (modalPlaceholderName)."
+  },
+  "modalFieldAddress": {
+    "message": "Adresse (URL)",
+    "description": "UI string (modalFieldAddress)."
+  },
+  "modalCancel": {
+    "message": "Abbrechen",
+    "description": "UI string (modalCancel)."
+  },
+  "modalAdd": {
+    "message": "Hinzufügen",
+    "description": "UI string (modalAdd)."
+  }
+}

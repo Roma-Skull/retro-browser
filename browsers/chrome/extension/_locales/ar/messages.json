@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "تأثير شاشة CRT منحنية وخطوط مسح وتوهج فوسفوري وفلتر VHS تناظري مع تحكم مباشر بالشدة وصفحة تبويب جديد متحركة.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "تبديل تفعيل فلتر CRT و VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Ρετρό καμπυλότητα CRT, γραμμές σάρωσης, φωσφορίζουσα λάμψη και αναλογικό εφέ VHS με ζωντανό έλεγχο έντασης.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Εναλλαγή φίλτρου CRT & VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

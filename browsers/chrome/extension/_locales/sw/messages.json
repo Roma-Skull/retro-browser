@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Mkunjio wa retro wa CRT, mistari ya skani, mwangaza wa fosforasi na kivuli cha analogi cha VHS chenye vidhibiti.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Washa/zima kivuli cha CRT na VHS",
+    "description": "Keyboard shortcut description."
+  }
+}

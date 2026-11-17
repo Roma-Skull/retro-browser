@@ -1,0 +1,230 @@
+{
+  "extName": {
+    "message": "Neon Horizon — CRT & VHS Shader",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Ретро-вигин CRT, сканлайни, світіння люмінофора й аналоговий VHS-шейдер із живим налаштуванням та новою вкладкою.",
+    "description": "Extension short summary (max 132 characters)."
+  },
+  "cmdToggleShader": {
+    "message": "Увімкнути/вимкнути CRT і VHS шейдер",
+    "description": "Keyboard shortcut description."
+  },
+  "popupSubtitle": {
+    "message": "CRT і VHS шейдер",
+    "description": "UI string (popupSubtitle)."
+  },
+  "toggleShaderTitle": {
+    "message": "Увімк./вимк. шейдер (Alt+Shift+V)",
+    "description": "UI string (toggleShaderTitle)."
+  },
+  "profileAriaLabel": {
+    "message": "Профіль налаштувань",
+    "description": "UI string (profileAriaLabel)."
+  },
+  "tabWebsites": {
+    "message": "Сайти",
+    "description": "UI string (tabWebsites)."
+  },
+  "tabNewTab": {
+    "message": "Нова вкладка",
+    "description": "UI string (tabNewTab)."
+  },
+  "checkingTab": {
+    "message": "Перевірка вкладки...",
+    "description": "UI string (checkingTab)."
+  },
+  "siteInfoOpenWebpage": {
+    "message": "Налаштування сайтів (відкрийте вебсторінку)",
+    "description": "UI string (siteInfoOpenWebpage)."
+  },
+  "siteInfoLocalFile": {
+    "message": "Локальний файл (file://)",
+    "description": "UI string (siteInfoLocalFile)."
+  },
+  "siteInfoInternalPage": {
+    "message": "Службова сторінка Chrome",
+    "description": "UI string (siteInfoInternalPage)."
+  },
+  "enableForHost": {
+    "message": "Увімкнути для $HOST$",
+    "description": "UI string (enableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "disableForHost": {
+    "message": "Вимкнути для $HOST$",
+    "description": "UI string (disableForHost).",
+    "placeholders": {
+      "host": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
+  },
+  "syncWithSites": {
+    "message": "Синхр. із сайтами",
+    "description": "UI string (syncWithSites)."
+  },
+  "syncWithSitesTitle": {
+    "message": "Використовувати налаштування сайтів на новій вкладці",
+    "description": "UI string (syncWithSitesTitle)."
+  },
+  "copyBtn": {
+    "message": "Копія",
+    "description": "UI string (copyBtn)."
+  },
+  "copyBtnTitle": {
+    "message": "Скопіювати налаштування із сайтів",
+    "description": "UI string (copyBtnTitle)."
+  },
+  "liveBg": {
+    "message": "Живий фон (політ над сіткою)",
+    "description": "UI string (liveBg)."
+  },
+  "liveBgTitle": {
+    "message": "Анімація польоту над сіткою, зірок і сонця",
+    "description": "UI string (liveBgTitle)."
+  },
+  "presetsAriaLabel": {
+    "message": "Пресети",
+    "description": "UI string (presetsAriaLabel)."
+  },
+  "presetSoft": {
+    "message": "М'який CRT",
+    "description": "UI string (presetSoft)."
+  },
+  "presetOutrun": {
+    "message": "Outrun 84",
+    "description": "UI string (presetOutrun)."
+  },
+  "presetVhs": {
+    "message": "VHS-касета",
+    "description": "UI string (presetVhs)."
+  },
+  "presetMinimal": {
+    "message": "Мінімум",
+    "description": "UI string (presetMinimal)."
+  },
+  "labelCurvatureCrt": {
+    "message": "Вигин екрана (CRT)",
+    "description": "UI string (labelCurvatureCrt)."
+  },
+  "labelCurvatureWebgl": {
+    "message": "Вигин екрана (WebGL2)",
+    "description": "UI string (labelCurvatureWebgl)."
+  },
+  "labelScanlines": {
+    "message": "Черезрядковий сканлайн",
+    "description": "UI string (labelScanlines)."
+  },
+  "labelBloom": {
+    "message": "Світіння люмінофора",
+    "description": "UI string (labelBloom)."
+  },
+  "labelVhs": {
+    "message": "VHS-стрічка та хроматика",
+    "description": "UI string (labelVhs)."
+  },
+  "labelSweep": {
+    "message": "Смуга розгортки",
+    "description": "UI string (labelSweep)."
+  },
+  "labelVignette": {
+    "message": "Скло та віньєтка",
+    "description": "UI string (labelVignette)."
+  },
+  "scanAnimation": {
+    "message": "Анімація розгортки",
+    "description": "UI string (scanAnimation)."
+  },
+  "resetBtn": {
+    "message": "Скинути",
+    "description": "UI string (resetBtn)."
+  },
+  "quickTogglePrefix": {
+    "message": "Швидке перем.:",
+    "description": "UI string (quickTogglePrefix)."
+  },
+  "newTabPageTitle": {
+    "message": "Нова вкладка — Neon Horizon",
+    "description": "UI string (newTabPageTitle)."
+  },
+  "switchSearchEngineTitle": {
+    "message": "Змінити пошуковик",
+    "description": "UI string (switchSearchEngineTitle)."
+  },
+  "searchPlaceholder": {
+    "message": "Пошук або введіть URL...",
+    "description": "UI string (searchPlaceholder)."
+  },
+  "searchAriaLabel": {
+    "message": "Пошук або введіть URL",
+    "description": "UI string (searchAriaLabel)."
+  },
+  "searchBtnTitle": {
+    "message": "Пошук",
+    "description": "UI string (searchBtnTitle)."
+  },
+  "quickSitesAriaLabel": {
+    "message": "Швидкі сайти",
+    "description": "UI string (quickSitesAriaLabel)."
+  },
+  "drawerAriaLabel": {
+    "message": "Налаштування CRT і VHS нової вкладки",
+    "description": "UI string (drawerAriaLabel)."
+  },
+  "drawerTitle": {
+    "message": "НОВА ВКЛАДКА CRT / VHS",
+    "description": "UI string (drawerTitle)."
+  },
+  "drawerSub": {
+    "message": "WebGL2-шейдер нової вкладки",
+    "description": "UI string (drawerSub)."
+  },
+  "toggleNewTabShaderTitle": {
+    "message": "Увімк./вимк. шейдер нової вкладки",
+    "description": "UI string (toggleNewTabShaderTitle)."
+  },
+  "removeSiteTitle": {
+    "message": "Видалити",
+    "description": "UI string (removeSiteTitle)."
+  },
+  "addSiteTitle": {
+    "message": "Додати сайт",
+    "description": "UI string (addSiteTitle)."
+  },
+  "addSiteLabel": {
+    "message": "Додати",
+    "description": "UI string (addSiteLabel)."
+  },
+  "modalAddTitle": {
+    "message": "Додати сайт",
+    "description": "UI string (modalAddTitle)."
+  },
+  "modalFieldName": {
+    "message": "Назва",
+    "description": "UI string (modalFieldName)."
+  },
+  "modalPlaceholderName": {
+    "message": "напр. GitHub",
+    "description": "UI string (modalPlaceholderName)."
+  },
+  "modalFieldAddress": {
+    "message": "Адреса (URL)",
+    "description": "UI string (modalFieldAddress)."
+  },
+  "modalCancel": {
+    "message": "Скасувати",
+    "description": "UI string (modalCancel)."
+  },
+  "modalAdd": {
+    "message": "Додати",
+    "description": "UI string (modalAdd)."
+  }
+}
