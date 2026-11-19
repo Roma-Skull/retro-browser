@@ -171,6 +171,34 @@ function Test-PackageLocales {
     return $localeDirs.Count
 }
 
+function New-NormalizedZipArchive {
+    param(
+        [Parameter(Mandatory)][string]$SourceDir,
+        [Parameter(Mandatory)][string]$ZipOutPath
+    )
+
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    if (Test-Path $ZipOutPath) { Remove-Item $ZipOutPath -Force }
+    $baseFull = [System.IO.Path]::GetFullPath($SourceDir).TrimEnd('\', '/')
+    $zip = [System.IO.Compression.ZipFile]::Open($ZipOutPath, [System.IO.Compression.ZipArchiveMode]::Create)
+    try {
+        $files = Get-ChildItem -Path $baseFull -Recurse -File | Sort-Object FullName
+        foreach ($file in $files) {
+            $rel = $file.FullName.Substring($baseFull.Length + 1).Replace('\', '/')
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $zip,
+                $file.FullName,
+                $rel,
+                [System.IO.Compression.CompressionLevel]::Optimal
+            ) | Out-Null
+        }
+    } finally {
+        $zip.Dispose()
+    }
+}
+
 function Copy-PackageLocales {
     param(
         [Parameter(Mandatory)][string]$SourceRoot,
@@ -290,20 +318,11 @@ if ($buildTheme) {
                 Copy-Item -Path $srcImg -Destination $dstImg -Force
             }
 
-            $archiveItems = @('manifest.json', 'images')
-            if (Copy-PackageLocales -SourceRoot $themeDir -StageDir $stageDir) {
-                $archiveItems += '_locales'
-            }
+            Copy-PackageLocales -SourceRoot $themeDir -StageDir $stageDir | Out-Null
 
             if ($CreateZip) {
                 $zipPath = Join-Path $distDir 'neon-horizon-synthwave-theme.zip'
-                if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-                Push-Location $stageDir
-                try {
-                    Compress-Archive -Path $archiveItems -DestinationPath $zipPath -CompressionLevel Optimal
-                } finally {
-                    Pop-Location
-                }
+                New-NormalizedZipArchive -SourceDir $stageDir -ZipOutPath $zipPath
                 Write-Host "Packaged theme ZIP archive: $zipPath"
             }
 
@@ -319,12 +338,7 @@ if ($buildTheme) {
                 $relCrxPath = Join-Path $relDir $relCrxName
                 $pemKeyPath = Join-Path $distDir 'keys\neon-horizon-synthwave-theme.pem'
 
-                Push-Location $stageDir
-                try {
-                    Compress-Archive -Path $archiveItems -DestinationPath $relZipPath -CompressionLevel Optimal
-                } finally {
-                    Pop-Location
-                }
+                New-NormalizedZipArchive -SourceDir $stageDir -ZipOutPath $relZipPath
 
                 Build-CrxPackage -StageDir $stageDir -CrxOutPath $relCrxPath -PemKeyPath $pemKeyPath
 
@@ -356,6 +370,9 @@ if ($buildExtension) {
         if ($extManifest.manifest_version -ne 3) {
             throw "Expected extension manifest_version 3, got $($extManifest.manifest_version)"
         }
+        if ($extManifest.PSObject.Properties.Name -contains 'chrome_url_overrides') {
+            throw "Extension manifest must not declare 'chrome_url_overrides' (breaks installation in Yandex Browser and Opera)."
+        }
         $extRequired = @(
             'manifest.json',
             'background.js',
@@ -363,13 +380,9 @@ if ($buildExtension) {
             'popup.html',
             'popup.css',
             'popup.js',
-            'newtab.html',
-            'newtab.css',
-            'newtab.js',
             'shared\defaults.js',
             'shared\i18n.js',
             'shared\controls.js',
-            'assets\ntp_wallpaper.png',
             'icons\icon16.png',
             'icons\icon48.png',
             'icons\icon128.png'
@@ -405,13 +418,7 @@ if ($buildExtension) {
 
                 if ($CreateZip) {
                     $extZipPath = Join-Path $distDir 'neon-horizon-crt-vhs-shader.zip'
-                    if (Test-Path $extZipPath) { Remove-Item $extZipPath -Force }
-                    Push-Location $stageDir
-                    try {
-                        Compress-Archive -Path @('*') -DestinationPath $extZipPath -CompressionLevel Optimal
-                    } finally {
-                        Pop-Location
-                    }
+                    New-NormalizedZipArchive -SourceDir $stageDir -ZipOutPath $extZipPath
                     Write-Host "Packaged extension ZIP archive: $extZipPath"
                 }
 
@@ -427,12 +434,7 @@ if ($buildExtension) {
                     $relCrxPath = Join-Path $relDir $relCrxName
                     $pemKeyPath = Join-Path $distDir 'keys\neon-horizon-crt-vhs-shader.pem'
 
-                    Push-Location $stageDir
-                    try {
-                        Compress-Archive -Path @('*') -DestinationPath $relZipPath -CompressionLevel Optimal
-                    } finally {
-                        Pop-Location
-                    }
+                    New-NormalizedZipArchive -SourceDir $stageDir -ZipOutPath $relZipPath
 
                     Build-CrxPackage -StageDir $stageDir -CrxOutPath $relCrxPath -PemKeyPath $pemKeyPath
 

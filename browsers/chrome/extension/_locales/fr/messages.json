@@ -19,32 +19,16 @@
     "message": "Activer/désactiver (Alt+Shift+V)",
     "description": "UI string (toggleShaderTitle)."
   },
-  "profileAriaLabel": {
-    "message": "Profil de paramètres",
-    "description": "UI string (profileAriaLabel)."
-  },
-  "tabWebsites": {
-    "message": "Sites web",
-    "description": "UI string (tabWebsites)."
-  },
-  "tabNewTab": {
-    "message": "Nouvel onglet",
-    "description": "UI string (tabNewTab)."
-  },
   "checkingTab": {
     "message": "Vérification...",
     "description": "UI string (checkingTab)."
-  },
-  "siteInfoOpenWebpage": {
-    "message": "Paramètres des sites (ouvrez une page web)",
-    "description": "UI string (siteInfoOpenWebpage)."
   },
   "siteInfoLocalFile": {
     "message": "Fichier local (file://)",
     "description": "UI string (siteInfoLocalFile)."
   },
   "siteInfoInternalPage": {
-    "message": "Page interne Chrome",
+    "message": "Page interne du navigateur",
     "description": "UI string (siteInfoInternalPage)."
   },
   "enableForHost": {
@@ -66,30 +50,6 @@
         "example": "example.com"
       }
     }
-  },
-  "syncWithSites": {
-    "message": "Sync. avec sites",
-    "description": "UI string (syncWithSites)."
-  },
-  "syncWithSitesTitle": {
-    "message": "Utiliser les mêmes réglages que sur les sites",
-    "description": "UI string (syncWithSitesTitle)."
-  },
-  "copyBtn": {
-    "message": "Copier",
-    "description": "UI string (copyBtn)."
-  },
-  "copyBtnTitle": {
-    "message": "Copier les réglages des sites",
-    "description": "UI string (copyBtnTitle)."
-  },
-  "liveBg": {
-    "message": "Fond animé (survol de grille)",
-    "description": "UI string (liveBg)."
-  },
-  "liveBgTitle": {
-    "message": "Animer la grille néon, les étoiles et le soleil",
-    "description": "UI string (liveBgTitle)."
   },
   "presetsAriaLabel": {
     "message": "Préréglages",
@@ -114,10 +74,6 @@
   "labelCurvatureCrt": {
     "message": "Courbure d'écran (CRT)",
     "description": "UI string (labelCurvatureCrt)."
-  },
-  "labelCurvatureWebgl": {
-    "message": "Courbure d'écran (WebGL2)",
-    "description": "UI string (labelCurvatureWebgl)."
   },
   "labelScanlines": {
     "message": "Lignes entrelacées",
@@ -150,81 +106,5 @@
   "quickTogglePrefix": {
     "message": "Raccourci :",
     "description": "UI string (quickTogglePrefix)."
-  },
-  "newTabPageTitle": {
-    "message": "Nouvel onglet — Neon Horizon",
-    "description": "UI string (newTabPageTitle)."
-  },
-  "switchSearchEngineTitle": {
-    "message": "Changer de moteur de recherche",
-    "description": "UI string (switchSearchEngineTitle)."
-  },
-  "searchPlaceholder": {
-    "message": "Rechercher ou saisir une URL...",
-    "description": "UI string (searchPlaceholder)."
-  },
-  "searchAriaLabel": {
-    "message": "Rechercher ou saisir une URL",
-    "description": "UI string (searchAriaLabel)."
-  },
-  "searchBtnTitle": {
-    "message": "Rechercher",
-    "description": "UI string (searchBtnTitle)."
-  },
-  "quickSitesAriaLabel": {
-    "message": "Sites rapides",
-    "description": "UI string (quickSitesAriaLabel)."
-  },
-  "drawerAriaLabel": {
-    "message": "Paramètres CRT et VHS du nouvel onglet",
-    "description": "UI string (drawerAriaLabel)."
-  },
-  "drawerTitle": {
-    "message": "NOUVEL ONGLET CRT / VHS",
-    "description": "UI string (drawerTitle)."
-  },
-  "drawerSub": {
-    "message": "Shader WebGL2 Nouvel onglet",
-    "description": "UI string (drawerSub)."
-  },
-  "toggleNewTabShaderTitle": {
-    "message": "Activer/désactiver le shader Nouvel onglet",
-    "description": "UI string (toggleNewTabShaderTitle)."
-  },
-  "removeSiteTitle": {
-    "message": "Supprimer",
-    "description": "UI string (removeSiteTitle)."
-  },
-  "addSiteTitle": {
-    "message": "Ajouter un site",
-    "description": "UI string (addSiteTitle)."
-  },
-  "addSiteLabel": {
-    "message": "Ajouter",
-    "description": "UI string (addSiteLabel)."
-  },
-  "modalAddTitle": {
-    "message": "Ajouter un site rapide",
-    "description": "UI string (modalAddTitle)."
-  },
-  "modalFieldName": {
-    "message": "Nom",
-    "description": "UI string (modalFieldName)."
-  },
-  "modalPlaceholderName": {
-    "message": "ex. GitHub",
-    "description": "UI string (modalPlaceholderName)."
-  },
-  "modalFieldAddress": {
-    "message": "Adresse (URL)",
-    "description": "UI string (modalFieldAddress)."
-  },
-  "modalCancel": {
-    "message": "Annuler",
-    "description": "UI string (modalCancel)."
-  },
-  "modalAdd": {
-    "message": "Ajouter",
-    "description": "UI string (modalAdd)."
   }
 }

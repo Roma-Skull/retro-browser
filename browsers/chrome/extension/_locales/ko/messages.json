@@ -19,32 +19,16 @@
     "message": "셰이더 켜기/끄기 (Alt+Shift+V)",
     "description": "UI string (toggleShaderTitle)."
   },
-  "profileAriaLabel": {
-    "message": "설정 프로필",
-    "description": "UI string (profileAriaLabel)."
-  },
-  "tabWebsites": {
-    "message": "웹사이트",
-    "description": "UI string (tabWebsites)."
-  },
-  "tabNewTab": {
-    "message": "새 탭",
-    "description": "UI string (tabNewTab)."
-  },
   "checkingTab": {
     "message": "탭 확인 중...",
     "description": "UI string (checkingTab)."
-  },
-  "siteInfoOpenWebpage": {
-    "message": "웹사이트 설정 (웹페이지를 여세요)",
-    "description": "UI string (siteInfoOpenWebpage)."
   },
   "siteInfoLocalFile": {
     "message": "로컬 파일 (file://)",
     "description": "UI string (siteInfoLocalFile)."
   },
   "siteInfoInternalPage": {
-    "message": "Chrome 내부 페이지",
+    "message": "브라우저 내부 페이지",
     "description": "UI string (siteInfoInternalPage)."
   },
   "enableForHost": {
@@ -66,30 +50,6 @@
         "example": "example.com"
       }
     }
-  },
-  "syncWithSites": {
-    "message": "사이트와 동기화",
-    "description": "UI string (syncWithSites)."
-  },
-  "syncWithSitesTitle": {
-    "message": "새 탭에서 웹사이트와 같은 설정 사용",
-    "description": "UI string (syncWithSitesTitle)."
-  },
-  "copyBtn": {
-    "message": "복사",
-    "description": "UI string (copyBtn)."
-  },
-  "copyBtnTitle": {
-    "message": "웹사이트 설정 복사",
-    "description": "UI string (copyBtnTitle)."
-  },
-  "liveBg": {
-    "message": "라이브 배경 (그리드 비행)",
-    "description": "UI string (liveBg)."
-  },
-  "liveBgTitle": {
-    "message": "네온 그리드, 별, 태양 애니메이션",
-    "description": "UI string (liveBgTitle)."
   },
   "presetsAriaLabel": {
     "message": "프리셋",
@@ -114,10 +74,6 @@
   "labelCurvatureCrt": {
     "message": "화면 곡률 (CRT)",
     "description": "UI string (labelCurvatureCrt)."
-  },
-  "labelCurvatureWebgl": {
-    "message": "화면 곡률 (WebGL2)",
-    "description": "UI string (labelCurvatureWebgl)."
   },
   "labelScanlines": {
     "message": "인터레이스 스캔라인",
@@ -150,81 +106,5 @@
   "quickTogglePrefix": {
     "message": "빠른 전환:",
     "description": "UI string (quickTogglePrefix)."
-  },
-  "newTabPageTitle": {
-    "message": "새 탭 — Neon Horizon",
-    "description": "UI string (newTabPageTitle)."
-  },
-  "switchSearchEngineTitle": {
-    "message": "검색 엔진 변경",
-    "description": "UI string (switchSearchEngineTitle)."
-  },
-  "searchPlaceholder": {
-    "message": "검색 또는 URL 입력...",
-    "description": "UI string (searchPlaceholder)."
-  },
-  "searchAriaLabel": {
-    "message": "검색 또는 URL 입력",
-    "description": "UI string (searchAriaLabel)."
-  },
-  "searchBtnTitle": {
-    "message": "검색",
-    "description": "UI string (searchBtnTitle)."
-  },
-  "quickSitesAriaLabel": {
-    "message": "빠른 사이트",
-    "description": "UI string (quickSitesAriaLabel)."
-  },
-  "drawerAriaLabel": {
-    "message": "새 탭 CRT 및 VHS 설정",
-    "description": "UI string (drawerAriaLabel)."
-  },
-  "drawerTitle": {
-    "message": "새 탭 CRT / VHS",
-    "description": "UI string (drawerTitle)."
-  },
-  "drawerSub": {
-    "message": "WebGL2 새 탭 셰이더",
-    "description": "UI string (drawerSub)."
-  },
-  "toggleNewTabShaderTitle": {
-    "message": "새 탭 셰이더 켜기/끄기",
-    "description": "UI string (toggleNewTabShaderTitle)."
-  },
-  "removeSiteTitle": {
-    "message": "삭제",
-    "description": "UI string (removeSiteTitle)."
-  },
-  "addSiteTitle": {
-    "message": "사이트 추가",
-    "description": "UI string (addSiteTitle)."
-  },
-  "addSiteLabel": {
-    "message": "추가",
-    "description": "UI string (addSiteLabel)."
-  },
-  "modalAddTitle": {
-    "message": "빠른 사이트 추가",
-    "description": "UI string (modalAddTitle)."
-  },
-  "modalFieldName": {
-    "message": "이름",
-    "description": "UI string (modalFieldName)."
-  },
-  "modalPlaceholderName": {
-    "message": "예: GitHub",
-    "description": "UI string (modalPlaceholderName)."
-  },
-  "modalFieldAddress": {
-    "message": "주소 (URL)",
-    "description": "UI string (modalFieldAddress)."
-  },
-  "modalCancel": {
-    "message": "취소",
-    "description": "UI string (modalCancel)."
-  },
-  "modalAdd": {
-    "message": "추가",
-    "description": "UI string (modalAdd)."
   }
 }

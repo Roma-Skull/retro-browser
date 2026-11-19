@@ -2,8 +2,8 @@
   'use strict';
 
   /**
-   * Binds shared CRT/VHS preset chips, range sliders, animation toggle, and reset button
-   * inside a container element for both the extension popup and the New Tab drawer.
+   * Binds CRT/VHS preset chips, range sliders, animation toggle, and reset button
+   * inside the extension popup container.
    */
   function createShaderProfileController({
     root,

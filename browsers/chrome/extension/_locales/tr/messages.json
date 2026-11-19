@@ -19,32 +19,16 @@
     "message": "Gölgelendiriciyi aç/kapat (Alt+Shift+V)",
     "description": "UI string (toggleShaderTitle)."
   },
-  "profileAriaLabel": {
-    "message": "Ayar profili",
-    "description": "UI string (profileAriaLabel)."
-  },
-  "tabWebsites": {
-    "message": "Web siteleri",
-    "description": "UI string (tabWebsites)."
-  },
-  "tabNewTab": {
-    "message": "Yeni Sekme",
-    "description": "UI string (tabNewTab)."
-  },
   "checkingTab": {
     "message": "Sekme kontrol ediliyor...",
     "description": "UI string (checkingTab)."
-  },
-  "siteInfoOpenWebpage": {
-    "message": "Site ayarları (bir web sayfası açın)",
-    "description": "UI string (siteInfoOpenWebpage)."
   },
   "siteInfoLocalFile": {
     "message": "Yerel dosya (file://)",
     "description": "UI string (siteInfoLocalFile)."
   },
   "siteInfoInternalPage": {
-    "message": "Chrome dahili sayfası",
+    "message": "Tarayıcı dahili sayfası",
     "description": "UI string (siteInfoInternalPage)."
   },
   "enableForHost": {
@@ -66,30 +50,6 @@
         "example": "example.com"
       }
     }
-  },
-  "syncWithSites": {
-    "message": "Sitelerle eşitle",
-    "description": "UI string (syncWithSites)."
-  },
-  "syncWithSitesTitle": {
-    "message": "Yeni Sekmede web siteleriyle aynı ayarları kullan",
-    "description": "UI string (syncWithSitesTitle)."
-  },
-  "copyBtn": {
-    "message": "Kopyala",
-    "description": "UI string (copyBtn)."
-  },
-  "copyBtnTitle": {
-    "message": "Web sitelerinden ayarları kopyala",
-    "description": "UI string (copyBtnTitle)."
-  },
-  "liveBg": {
-    "message": "Canlı arka plan (ızgara uçuşu)",
-    "description": "UI string (liveBg)."
-  },
-  "liveBgTitle": {
-    "message": "Neon ızgarayı, yıldızları ve güneşi canlandır",
-    "description": "UI string (liveBgTitle)."
   },
   "presetsAriaLabel": {
     "message": "Hazır ayarlar",
@@ -114,10 +74,6 @@
   "labelCurvatureCrt": {
     "message": "Ekran eğriliği (CRT)",
     "description": "UI string (labelCurvatureCrt)."
-  },
-  "labelCurvatureWebgl": {
-    "message": "Ekran eğriliği (WebGL2)",
-    "description": "UI string (labelCurvatureWebgl)."
   },
   "labelScanlines": {
     "message": "Taramalı çizgiler",
@@ -150,81 +106,5 @@
   "quickTogglePrefix": {
     "message": "Hızlı geçiş:",
     "description": "UI string (quickTogglePrefix)."
-  },
-  "newTabPageTitle": {
-    "message": "Yeni Sekme — Neon Horizon",
-    "description": "UI string (newTabPageTitle)."
-  },
-  "switchSearchEngineTitle": {
-    "message": "Arama motorunu değiştir",
-    "description": "UI string (switchSearchEngineTitle)."
-  },
-  "searchPlaceholder": {
-    "message": "Ara veya URL gir...",
-    "description": "UI string (searchPlaceholder)."
-  },
-  "searchAriaLabel": {
-    "message": "Ara veya URL gir",
-    "description": "UI string (searchAriaLabel)."
-  },
-  "searchBtnTitle": {
-    "message": "Ara",
-    "description": "UI string (searchBtnTitle)."
-  },
-  "quickSitesAriaLabel": {
-    "message": "Hızlı Siteler",
-    "description": "UI string (quickSitesAriaLabel)."
-  },
-  "drawerAriaLabel": {
-    "message": "Yeni Sekme CRT ve VHS ayarları",
-    "description": "UI string (drawerAriaLabel)."
-  },
-  "drawerTitle": {
-    "message": "YENİ SEKME CRT / VHS",
-    "description": "UI string (drawerTitle)."
-  },
-  "drawerSub": {
-    "message": "WebGL2 Yeni Sekme Gölgelendiricisi",
-    "description": "UI string (drawerSub)."
-  },
-  "toggleNewTabShaderTitle": {
-    "message": "Yeni Sekme gölgelendiricisini aç/kapat",
-    "description": "UI string (toggleNewTabShaderTitle)."
-  },
-  "removeSiteTitle": {
-    "message": "Kaldır",
-    "description": "UI string (removeSiteTitle)."
-  },
-  "addSiteTitle": {
-    "message": "Site ekle",
-    "description": "UI string (addSiteTitle)."
-  },
-  "addSiteLabel": {
-    "message": "Ekle",
-    "description": "UI string (addSiteLabel)."
-  },
-  "modalAddTitle": {
-    "message": "Hızlı Site Ekle",
-    "description": "UI string (modalAddTitle)."
-  },
-  "modalFieldName": {
-    "message": "Ad",
-    "description": "UI string (modalFieldName)."
-  },
-  "modalPlaceholderName": {
-    "message": "örn. GitHub",
-    "description": "UI string (modalPlaceholderName)."
-  },
-  "modalFieldAddress": {
-    "message": "Adres (URL)",
-    "description": "UI string (modalFieldAddress)."
-  },
-  "modalCancel": {
-    "message": "İptal",
-    "description": "UI string (modalCancel)."
-  },
-  "modalAdd": {
-    "message": "Ekle",
-    "description": "UI string (modalAdd)."
   }
 }

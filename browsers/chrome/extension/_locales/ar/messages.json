@@ -4,7 +4,7 @@
     "description": "Extension name."
   },
   "extDescription": {
-    "message": "تأثير شاشة CRT منحنية وخطوط مسح وتوهج فوسفوري وفلتر VHS تناظري مع تحكم مباشر بالشدة وصفحة تبويب جديد متحركة.",
+    "message": "تأثير شاشة CRT منحنية وخطوط مسح وتوهج فوسفوري وفلتر VHS تناظري مع تحكم مباشر بالشدة.",
     "description": "Extension short summary (max 132 characters)."
   },
   "cmdToggleShader": {

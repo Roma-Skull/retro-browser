@@ -3,13 +3,6 @@
 
   const SLIDER_KEYS = Object.freeze(['curvature', 'scanlines', 'bloom', 'vhs', 'sweep', 'vignette']);
 
-  const DEFAULT_QUICK_LINKS = Object.freeze([
-    { title: 'Google', url: 'https://www.google.com' },
-    { title: 'YouTube', url: 'https://www.youtube.com' },
-    { title: 'GitHub', url: 'https://github.com' },
-    { title: 'Gmail', url: 'https://mail.google.com' }
-  ]);
-
   const PRESETS = Object.freeze({
     soft: Object.freeze({
       curvature: 14,
@@ -49,20 +42,6 @@
     })
   });
 
-  const DEFAULT_NEWTAB_SETTINGS = Object.freeze({
-    enabled: true,
-    syncWithSites: false,
-    animateBg: true,
-    preset: 'vhs',
-    curvature: PRESETS.vhs.curvature,
-    scanlines: PRESETS.vhs.scanlines,
-    bloom: PRESETS.vhs.bloom,
-    vhs: PRESETS.vhs.vhs,
-    sweep: PRESETS.vhs.sweep,
-    vignette: PRESETS.vhs.vignette,
-    animate: PRESETS.vhs.animate
-  });
-
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
     preset: 'vhs',
@@ -73,8 +52,7 @@
     sweep: PRESETS.vhs.sweep,
     vignette: PRESETS.vhs.vignette,
     animate: PRESETS.vhs.animate,
-    disabledHosts: [],
-    newTab: DEFAULT_NEWTAB_SETTINGS
+    disabledHosts: []
   });
 
   function clampPercent(value, fallback) {
@@ -103,52 +81,18 @@
     const hosts = Array.isArray(src.disabledHosts)
       ? Array.from(new Set(src.disabledHosts.filter((h) => typeof h === 'string' && h.length > 0)))
       : [];
-    const ntRaw = src.newTab && typeof src.newTab === 'object' ? src.newTab : {};
 
     return {
       ...normalizeProfile(src, DEFAULT_SETTINGS),
-      disabledHosts: hosts,
-      newTab: {
-        ...normalizeProfile(ntRaw, DEFAULT_NEWTAB_SETTINGS),
-        syncWithSites: typeof ntRaw.syncWithSites === 'boolean'
-          ? ntRaw.syncWithSites
-          : DEFAULT_NEWTAB_SETTINGS.syncWithSites,
-        animateBg: typeof ntRaw.animateBg === 'boolean'
-          ? ntRaw.animateBg
-          : DEFAULT_NEWTAB_SETTINGS.animateBg
-      }
-    };
-  }
-
-  function resolveNewTabProfile(settings) {
-    const normalized = normalizeSettings(settings);
-    if (!normalized.newTab.syncWithSites) {
-      return normalized.newTab;
-    }
-    return {
-      ...normalized.newTab,
-      enabled: normalized.enabled,
-      preset: normalized.preset,
-      curvature: normalized.curvature,
-      scanlines: normalized.scanlines,
-      bloom: normalized.bloom,
-      vhs: normalized.vhs,
-      sweep: normalized.sweep,
-      vignette: normalized.vignette,
-      animate: normalized.animate
+      disabledHosts: hosts
     };
   }
 
   globalThis.NeonHorizonDefaults = Object.freeze({
     STORAGE_KEY: 'nhCrtSettings',
-    QUICK_LINKS_KEY: 'nhQuickLinks',
-    SEARCH_ENGINE_KEY: 'nhSearchEngine',
     SLIDER_KEYS,
-    DEFAULT_QUICK_LINKS,
     DEFAULT_SETTINGS,
-    DEFAULT_NEWTAB_SETTINGS,
     PRESETS,
-    normalizeSettings,
-    resolveNewTabProfile
+    normalizeSettings
   });
 })();

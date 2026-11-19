@@ -4,7 +4,7 @@
     "description": "Extension name."
   },
   "extDescription": {
-    "message": "レトロなCRT湾曲、走査線、蛍光体ブルーム、アナログVHSシェーダーとリアルタイム強度調整＆WebGL2新しいタブ。",
+    "message": "レトロなCRT湾曲、走査線、蛍光体ブルーム、アナログVHSシェーダーオーバーレイとリアルタイム強度調整。",
     "description": "Extension short summary (max 132 characters)."
   },
   "cmdToggleShader": {
@@ -19,32 +19,16 @@
     "message": "シェーダー切替 (Alt+Shift+V)",
     "description": "UI string (toggleShaderTitle)."
   },
-  "profileAriaLabel": {
-    "message": "設定プロファイル",
-    "description": "UI string (profileAriaLabel)."
-  },
-  "tabWebsites": {
-    "message": "ウェブサイト",
-    "description": "UI string (tabWebsites)."
-  },
-  "tabNewTab": {
-    "message": "新しいタブ",
-    "description": "UI string (tabNewTab)."
-  },
   "checkingTab": {
     "message": "タブを確認中...",
     "description": "UI string (checkingTab)."
-  },
-  "siteInfoOpenWebpage": {
-    "message": "サイト設定 (ウェブページを開いてください)",
-    "description": "UI string (siteInfoOpenWebpage)."
   },
   "siteInfoLocalFile": {
     "message": "ローカルファイル (file://)",
     "description": "UI string (siteInfoLocalFile)."
   },
   "siteInfoInternalPage": {
-    "message": "Chrome 内部ページ",
+    "message": "ブラウザの内部ページ",
     "description": "UI string (siteInfoInternalPage)."
   },
   "enableForHost": {
@@ -66,30 +50,6 @@
         "example": "example.com"
       }
     }
-  },
-  "syncWithSites": {
-    "message": "サイトと同期",
-    "description": "UI string (syncWithSites)."
-  },
-  "syncWithSitesTitle": {
-    "message": "新しいタブでウェブサイトと同じ設定を使う",
-    "description": "UI string (syncWithSitesTitle)."
-  },
-  "copyBtn": {
-    "message": "コピー",
-    "description": "UI string (copyBtn)."
-  },
-  "copyBtnTitle": {
-    "message": "ウェブサイトから設定をコピー",
-    "description": "UI string (copyBtnTitle)."
-  },
-  "liveBg": {
-    "message": "ライブ背景 (グリッド飛行)",
-    "description": "UI string (liveBg)."
-  },
-  "liveBgTitle": {
-    "message": "ネオングリッド・星・太陽をアニメーション表示",
-    "description": "UI string (liveBgTitle)."
   },
   "presetsAriaLabel": {
     "message": "プリセット",
@@ -114,10 +74,6 @@
   "labelCurvatureCrt": {
     "message": "画面の湾曲 (CRT)",
     "description": "UI string (labelCurvatureCrt)."
-  },
-  "labelCurvatureWebgl": {
-    "message": "画面の湾曲 (WebGL2)",
-    "description": "UI string (labelCurvatureWebgl)."
   },
   "labelScanlines": {
     "message": "インターレース走査線",
@@ -150,81 +106,5 @@
   "quickTogglePrefix": {
     "message": "ショートカット:",
     "description": "UI string (quickTogglePrefix)."
-  },
-  "newTabPageTitle": {
-    "message": "新しいタブ — Neon Horizon",
-    "description": "UI string (newTabPageTitle)."
-  },
-  "switchSearchEngineTitle": {
-    "message": "検索エンジンを切替",
-    "description": "UI string (switchSearchEngineTitle)."
-  },
-  "searchPlaceholder": {
-    "message": "検索または URL を入力...",
-    "description": "UI string (searchPlaceholder)."
-  },
-  "searchAriaLabel": {
-    "message": "検索または URL を入力",
-    "description": "UI string (searchAriaLabel)."
-  },
-  "searchBtnTitle": {
-    "message": "検索",
-    "description": "UI string (searchBtnTitle)."
-  },
-  "quickSitesAriaLabel": {
-    "message": "クイックサイト",
-    "description": "UI string (quickSitesAriaLabel)."
-  },
-  "drawerAriaLabel": {
-    "message": "新しいタブの CRT / VHS 設定",
-    "description": "UI string (drawerAriaLabel)."
-  },
-  "drawerTitle": {
-    "message": "NEW TAB CRT / VHS",
-    "description": "UI string (drawerTitle)."
-  },
-  "drawerSub": {
-    "message": "WebGL2 新しいタブシェーダー",
-    "description": "UI string (drawerSub)."
-  },
-  "toggleNewTabShaderTitle": {
-    "message": "新しいタブのシェーダー切替",
-    "description": "UI string (toggleNewTabShaderTitle)."
-  },
-  "removeSiteTitle": {
-    "message": "削除",
-    "description": "UI string (removeSiteTitle)."
-  },
-  "addSiteTitle": {
-    "message": "サイトを追加",
-    "description": "UI string (addSiteTitle)."
-  },
-  "addSiteLabel": {
-    "message": "追加",
-    "description": "UI string (addSiteLabel)."
-  },
-  "modalAddTitle": {
-    "message": "クイックサイトを追加",
-    "description": "UI string (modalAddTitle)."
-  },
-  "modalFieldName": {
-    "message": "名前",
-    "description": "UI string (modalFieldName)."
-  },
-  "modalPlaceholderName": {
-    "message": "例: GitHub",
-    "description": "UI string (modalPlaceholderName)."
-  },
-  "modalFieldAddress": {
-    "message": "URL アドレス",
-    "description": "UI string (modalFieldAddress)."
-  },
-  "modalCancel": {
-    "message": "キャンセル",
-    "description": "UI string (modalCancel)."
-  },
-  "modalAdd": {
-    "message": "追加",
-    "description": "UI string (modalAdd)."
   }
 }

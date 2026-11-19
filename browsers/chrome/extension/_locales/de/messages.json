@@ -4,7 +4,7 @@
     "description": "Extension name."
   },
   "extDescription": {
-    "message": "Retro-CRT-Wölbung, Scanlines, Phosphor-Glow und analoger VHS-Shader mit Live-Intensitätsreglern und animiertem Neuer-Tab.",
+    "message": "Retro-CRT-Wölbung, Scanlines, Phosphor-Glow und analoger VHS-Shader mit Live-Intensitätsreglern.",
     "description": "Extension short summary (max 132 characters)."
   },
   "cmdToggleShader": {
@@ -19,32 +19,16 @@
     "message": "Shader ein-/ausschalten (Alt+Shift+V)",
     "description": "UI string (toggleShaderTitle)."
   },
-  "profileAriaLabel": {
-    "message": "Einstellungsprofil",
-    "description": "UI string (profileAriaLabel)."
-  },
-  "tabWebsites": {
-    "message": "Websites",
-    "description": "UI string (tabWebsites)."
-  },
-  "tabNewTab": {
-    "message": "Neuer Tab",
-    "description": "UI string (tabNewTab)."
-  },
   "checkingTab": {
     "message": "Tab wird geprüft...",
     "description": "UI string (checkingTab)."
-  },
-  "siteInfoOpenWebpage": {
-    "message": "Website-Einstellungen (Webseite öffnen)",
-    "description": "UI string (siteInfoOpenWebpage)."
   },
   "siteInfoLocalFile": {
     "message": "Lokale Datei (file://)",
     "description": "UI string (siteInfoLocalFile)."
   },
   "siteInfoInternalPage": {
-    "message": "Interne Chrome-Seite",
+    "message": "Interne Browser-Seite",
     "description": "UI string (siteInfoInternalPage)."
   },
   "enableForHost": {
@@ -66,30 +50,6 @@
         "example": "example.com"
       }
     }
-  },
-  "syncWithSites": {
-    "message": "Mit Websites sync.",
-    "description": "UI string (syncWithSites)."
-  },
-  "syncWithSitesTitle": {
-    "message": "Website-Einstellungen auf dem Neuen Tab verwenden",
-    "description": "UI string (syncWithSitesTitle)."
-  },
-  "copyBtn": {
-    "message": "Kopieren",
-    "description": "UI string (copyBtn)."
-  },
-  "copyBtnTitle": {
-    "message": "Einstellungen von Websites kopieren",
-    "description": "UI string (copyBtnTitle)."
-  },
-  "liveBg": {
-    "message": "Live-Hintergrund (Gitterflug)",
-    "description": "UI string (liveBg)."
-  },
-  "liveBgTitle": {
-    "message": "Neon-Gitterflug, funkelnde Sterne und Sonne animieren",
-    "description": "UI string (liveBgTitle)."
   },
   "presetsAriaLabel": {
     "message": "Voreinstellungen",
@@ -114,10 +74,6 @@
   "labelCurvatureCrt": {
     "message": "Bildschirmwölbung (CRT)",
     "description": "UI string (labelCurvatureCrt)."
-  },
-  "labelCurvatureWebgl": {
-    "message": "Bildschirmwölbung (WebGL2)",
-    "description": "UI string (labelCurvatureWebgl)."
   },
   "labelScanlines": {
     "message": "Zeilensprung-Scanlines",
@@ -150,81 +106,5 @@
   "quickTogglePrefix": {
     "message": "Schnellumschalter:",
     "description": "UI string (quickTogglePrefix)."
-  },
-  "newTabPageTitle": {
-    "message": "Neuer Tab — Neon Horizon",
-    "description": "UI string (newTabPageTitle)."
-  },
-  "switchSearchEngineTitle": {
-    "message": "Suchmaschine wechseln",
-    "description": "UI string (switchSearchEngineTitle)."
-  },
-  "searchPlaceholder": {
-    "message": "Suchen oder URL eingeben...",
-    "description": "UI string (searchPlaceholder)."
-  },
-  "searchAriaLabel": {
-    "message": "Suchen oder URL eingeben",
-    "description": "UI string (searchAriaLabel)."
-  },
-  "searchBtnTitle": {
-    "message": "Suchen",
-    "description": "UI string (searchBtnTitle)."
-  },
-  "quickSitesAriaLabel": {
-    "message": "Schnellzugriff",
-    "description": "UI string (quickSitesAriaLabel)."
-  },
-  "drawerAriaLabel": {
-    "message": "Neuer-Tab CRT- und VHS-Einstellungen",
-    "description": "UI string (drawerAriaLabel)."
-  },
-  "drawerTitle": {
-    "message": "NEUER TAB CRT / VHS",
-    "description": "UI string (drawerTitle)."
-  },
-  "drawerSub": {
-    "message": "WebGL2 Neuer-Tab-Shader",
-    "description": "UI string (drawerSub)."
-  },
-  "toggleNewTabShaderTitle": {
-    "message": "Neuer-Tab-Shader ein-/ausschalten",
-    "description": "UI string (toggleNewTabShaderTitle)."
-  },
-  "removeSiteTitle": {
-    "message": "Entfernen",
-    "description": "UI string (removeSiteTitle)."
-  },
-  "addSiteTitle": {
-    "message": "Seite hinzufügen",
-    "description": "UI string (addSiteTitle)."
-  },
-  "addSiteLabel": {
-    "message": "Hinzufügen",
-    "description": "UI string (addSiteLabel)."
-  },
-  "modalAddTitle": {
-    "message": "Schnellzugriff hinzufügen",
-    "description": "UI string (modalAddTitle)."
-  },
-  "modalFieldName": {
-    "message": "Name",
-    "description": "UI string (modalFieldName)."
-  },
-  "modalPlaceholderName": {
-    "message": "z. B. GitHub",
-    "description": "UI string (modalPlaceholderName)."
-  },
-  "modalFieldAddress": {
-    "message": "Adresse (URL)",
-    "description": "UI string (modalFieldAddress)."
-  },
-  "modalCancel": {
-    "message": "Abbrechen",
-    "description": "UI string (modalCancel)."
-  },
-  "modalAdd": {
-    "message": "Hinzufügen",
-    "description": "UI string (modalAdd)."
   }
 }

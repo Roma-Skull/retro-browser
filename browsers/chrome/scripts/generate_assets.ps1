@@ -1266,14 +1266,6 @@ if ($genTheme) {
         (Join-Path $imgDir 'theme_ntp_background.png'),
         5120, 2160, 500.0, 1200.0, $cVoidBg, 1984
     )
-    if (Test-Path (Join-Path $ChromeRoot 'extension\manifest.json')) {
-        $extAssetsDir = Join-Path $ChromeRoot 'extension\assets'
-        New-Item -ItemType Directory -Force -Path $extAssetsDir | Out-Null
-        [SynthwaveAssets.Generator]::BuildNtpWallpaper(
-            (Join-Path $extAssetsDir 'ntp_wallpaper.png'),
-            1920, 1080, 475.0, 1080.0, $cVoidBg, 1984
-        )
-    }
 
     # 2. Browser Frame strips (2400x160)
     [SynthwaveAssets.Generator]::BuildUiStrip(
@@ -1373,18 +1365,18 @@ if ($genExtension) {
         $sourceNtp,
         (Join-Path $extStoreDir 'promo-small-440x280.png'),
         440, 280, $false,
-        'CHROME EXTENSION',
+        'BROWSER EXTENSION',
         'CRT & VHS SHADER',
-        'WebGL2 New Tab & CRT/VHS Overlay',
+        'Real-Time CRT & VHS Screen Overlay',
         $true
     )
     [SynthwaveAssets.Generator]::BuildPromoTile(
         $sourceNtp,
         (Join-Path $extStoreDir 'promo-marquee-1400x560.png'),
         1400, 560, $true,
-        'CHROME EXTENSION',
+        'BROWSER EXTENSION',
         'CRT & VHS SHADER',
-        "Animated WebGL2 New Tab  •  CRT Screen Curvature  •  VHS & Bloom",
+        "CRT Screen Curvature  •  Interlaced Scanlines  •  VHS & Phosphor Bloom",
         $true
     )
 
